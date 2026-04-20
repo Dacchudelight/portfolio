@@ -1,0 +1,154 @@
+/* 🔹 RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 🔹 THEME (same as your main CSS but isolated) */
+:root {
+    --primary: #2dd4bf;
+    --primary-dark: #14b8a6;
+
+    --bg-main: #0a0e17;
+    --bg-card: #111827;
+    --bg-elevated: #1a2332;
+
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+
+    --border: #1e293b;
+
+    --shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* 🔹 BODY */
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-main);
+    color: var(--text-primary);
+}
+
+/* 🔹 NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 18px 6%;
+    border-bottom: 1px solid var(--border);
+
+    background: rgba(10,14,23,0.9);
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.nav-links a:hover {
+    color: var(--primary);
+}
+
+/* 🔹 WRAPPER */
+.login-wrapper {
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 🔹 CARD */
+.login-card {
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: 18px;
+
+    width: 100%;
+    max-width: 380px;
+
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+
+    text-align: center;
+}
+
+/* 🔹 TITLE */
+.login-card h2 {
+    margin-bottom: 25px;
+}
+
+/* 🔹 FORM */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 🔹 INPUT */
+.login-form input {
+    padding: 12px;
+    border-radius: 10px;
+
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+/* 🔹 INPUT FOCUS */
+.login-form input:focus {
+    outline: none;
+    border: 1px solid var(--primary);
+}
+
+/* 🔹 BUTTON */
+.login-form button {
+    padding: 12px;
+    border-radius: 10px;
+
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #000;
+
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+/* 🔹 HOVER */
+.login-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(45, 212, 191, 0.3);
+}
+.flash {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.flash.error {
+    background: #ff4d4d;
+    color: white;
+}
+
+.flash.success {
+    background: #22c55e;
+    color: white;
+}

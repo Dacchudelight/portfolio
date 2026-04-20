@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Resume</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/upload_resume.css') }}">
+</head>
+<body>
+
+<!-- 🔹 TOP NAVBAR -->
+<div class="top-bar">
+    <div class="nav-left">
+        <span class="page-title"> Upload Resume</span>
+    </div>
+
+    <div class="nav-right">
+        <a href="/" class="nav-btn home-btn">Home</a>
+        <a href="/admin" class="nav-btn dashboard-btn">Admin panel</a>
+    </div>
+</div>
+
+<!-- 🔹 MAIN CONTAINER -->
+<div class="container">
+
+    <h2>Upload Resume</h2>
+
+    <!-- 🔥 FLASH MESSAGE -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-msg">
+          {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- 🔥 CURRENT RESUME STATUS -->
+    {% if current_resume %}
+        <div class="current-file">
+             Current Resume: <strong>{{ current_resume }}</strong>
+        </div>
+    {% else %}
+        <div class="current-file no-file">
+             No resume uploaded yet
+        </div>
+    {% endif %}
+
+    <!-- 🔹 UPLOAD FORM -->
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="resume" accept=".pdf" required>
+        <button type="submit" class="upload-btn">Upload Resume</button>
+    </form>
+
+    <div class="note">Only PDF files allowed</div>
+
+</div>
+
+<!-- 🔹 AUTO HIDE TOAST -->
+<script>
+setTimeout(() => {
+    const msg = document.querySelector('.flash-msg');
+    if (msg) {
+        msg.classList.add('fade-out');
+        setTimeout(() => msg.remove(), 500);
+    }
+}, 3000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Certificate</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_certificate.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <h2>🎓 Add Certificate</h2>
+
+    <div class="nav-buttons">
+        <a href="/" class="btn home-btn">🏠 Home</a>
+        <a href="/certificates" class="btn back-btn">⬅ Back</a>
+    </div>
+</header>
+
+<main class="container">
+    <div class="form-card">
+        <h3>Add New Certificate</h3>
+
+        <form id="certForm" method="POST" enctype="multipart/form-data">
+
+            <label>Certificate Title</label>
+            <input type="text" name="title" required>
+
+            <label>Issuer</label>
+            <input type="text" name="issuer" required>
+
+            <label>Upload Certificate Image</label>
+            <input type="file" name="image" accept="image/*" required onchange="previewImage(event)">
+
+            <img id="preview" class="preview-img" style="display:none;">
+
+            <button type="submit" class="btn primary">➕ Add Certificate</button>
+
+        </form>
+    </div>
+</main>
+
+<script>
+function previewImage(event) {
+    const img = document.getElementById('preview');
+    img.src = URL.createObjectURL(event.target.files[0]);
+    img.style.display = 'block';
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("certForm");
+
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        fetch("/add_certificate", {
+            method: "POST",
+            body: new FormData(form)
+        })
+        .then(res => {
+            if (res.ok) {
+                showToast("Certificate added successfully!");
+
+                form.reset();
+
+                const img = document.getElementById('preview');
+                img.style.display = "none";
+            } else {
+                showToast("Upload failed!", "error");
+            }
+        })
+        .catch(() => {
+            showToast("Server error!", "error");
+        });
+    });
+});
+
+function showToast(message, type = "success") {
+    const toast = document.createElement("div");
+    toast.className = "toast " + type;
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>
+
+</body>
+</html>

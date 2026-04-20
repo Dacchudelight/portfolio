@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Certificates</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/certificates.css') }}">
+</head>
+<body>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div id="toast">{{ messages[0] }}</div>
+  {% endif %}
+{% endwith %}
+
+<!-- 🔹 NAVBAR -->
+<header class="navbar">
+    <h2>🎓 Certificates</h2>
+
+    <div class="nav-buttons">
+        <a href="/" class="btn home-btn">🏠 Home</a>
+        <a href="/admin" class="btn back-btn">⬅ Back</a>
+        <a href="/add_certificate" class="btn primary">+ Add Certificate</a>
+    </div>
+</header>
+
+<!-- 🔹 CONTENT -->
+<main class="container">
+
+    <div class="header-section">
+        <h3>Your Certificates</h3>
+        <p>Manage your certifications</p>
+    </div>
+
+    <div class="project-list">
+
+        {% if certificates and certificates|length > 0 %}
+
+            {% for c in certificates %}
+            <div class="project-card">
+
+                <div class="project-content">
+                    {% if c[3] %}
+                    <img src="{{ url_for('static', filename='uploads/' + c[3]) }}" class="cert-img">
+                    {% endif %}
+
+                    <h4>{{ c[1] }}</h4>
+                    <p>{{ c[2] }}</p>
+                </div>
+
+                <div class="project-actions">
+                    <a href="/edit_certificate/{{ c[0] }}" class="btn edit">✏️ Edit</a>
+
+                    <form action="/delete_certificate/{{ c[0] }}" method="POST">
+                        <button class="btn danger"
+                            onclick="return confirm('Delete this certificate?');">
+                            🗑 Delete
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <p class="empty">No certificates added yet.</p>
+        {% endif %}
+
+    </div>
+
+</main>
+
+</body>
+</html>

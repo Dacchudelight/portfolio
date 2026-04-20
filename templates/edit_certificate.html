@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Certificate</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_certificate.css') }}">
+</head>
+<body>
+
+<!-- 🔹 NAVBAR -->
+<header class="navbar">
+    <h2>✏️ Edit Certificate</h2>
+
+    <div class="nav-buttons">
+        <a href="/certificates" class="btn">← Back</a>
+    </div>
+</header>
+
+<!-- 🔹 CONTENT -->
+<main class="container">
+
+    <div class="form-card">
+        <h3>Update Certificate</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <label>Certificate Title</label>
+            <input type="text" name="title" value="{{ cert[1] }}" required>
+
+            <label>Issuer</label>
+            <input type="text" name="issuer" value="{{ cert[2] }}" required>
+
+            <label>Update Image (optional)</label>
+            <input type="file" name="image" accept="image/*" onchange="previewImage(event)">
+
+            <!-- 🔹 Current Image -->
+            {% if cert[3] %}
+            <p style="margin-top:10px;">Current Image:</p>
+            <img src="{{ url_for('static', filename='uploads/' + cert[3]) }}" class="preview-img" style="display:block;">
+            {% endif %}
+
+            <!-- 🔹 New Preview -->
+            <img id="preview" class="preview-img">
+
+            <button type="submit" class="btn primary">💾 Update Certificate</button>
+
+        </form>
+    </div>
+
+</main>
+
+<!-- 🔹 JS Preview -->
+<script>
+function previewImage(event) {
+    const img = document.getElementById('preview');
+    img.src = URL.createObjectURL(event.target.files[0]);
+    img.style.display = 'block';
+}
+</script>
+
+</body>
+</html>

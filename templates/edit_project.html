@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Project</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_project.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <!-- 🔹 NAV BUTTONS -->
+<div class="nav-buttons">
+    <a href="/" class="btn home-btn">🏠 Home</a>
+    <a href="/admin" class="btn back-btn">⬅ Back</a>
+</div>
+
+    <h2>Edit Project</h2>
+
+    <!-- 🔹 FLASH MESSAGE -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="toast {{ category }}">
+          <span class="icon">
+              {% if category == 'success' %}✔{% else %}❌{% endif %}
+          </span>
+          <span class="msg">{{ message }}</span>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+    <!-- 🔹 FORM -->
+    <form method="POST" action="/update_project/{{ project[0] }}">
+
+        <label>Title</label>
+        <input type="text" name="title" value="{{ project[1] }}" required>
+
+        <label>Description</label>
+        <textarea name="description" required>{{ project[2] }}</textarea>
+
+        <label>Tools</label>
+        <input type="text" name="tools" value="{{ project[3] }}">
+
+        <label>Project Link</label>
+        <input type="text" name="link" value="{{ project[4] }}">
+
+        <button type="submit">Update Project</button>
+
+    </form>
+
+</div>
+
+<!-- 🔹 LINK JS FILE -->
+<script src="{{ url_for('static', filename='js/edit_project.js') }}"></script>
+
+</body>
+</html>

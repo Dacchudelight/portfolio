@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+
+<!-- 🔹 TOAST MESSAGE -->
+<!-- 🔹 TOAST MESSAGE -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, msg in messages %}
+      <div class="toast {{ category }}">{{ msg }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+<!-- 🔹 NAVBAR -->
+<header class="navbar">
+    <h2>⚙️ Admin Dashboard</h2>
+
+    <div class="nav-buttons">
+        <a href="/" class="btn">🏠 Home</a>
+        <a href="/add_project" class="btn primary">+ Add Project</a>
+        <a href="/certificates" class="btn secondary">🎓 Certificates</a>
+        <a href="/profile" class="btn secondary">👤 Profile</a>
+        <a href="/upload_resume" class="nav-btn upload">📄 Upload Resume</a>
+        <a href="/logout" class="btn danger">Logout</a>
+    </div>
+</header>
+
+<!-- 🔹 MAIN CONTENT -->
+<main class="container">
+
+    <div class="header-section">
+        <h3>Your Projects</h3>
+        <p>Manage, edit or remove your portfolio projects</p>
+    </div>
+
+    <div class="project-list">
+        {% for p in projects %}
+        <div class="project-card">
+
+            <div class="project-content">
+                <h4>{{ p[1] }}</h4>
+                <p>{{ p[3] }}</p>
+            </div>
+
+            <div class="project-actions">
+                <a href="/edit_project/{{ p[0] }}" class="btn edit">✏️ Edit</a>
+
+                <form action="/delete_project/{{ p[0] }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn danger"
+                        onclick="return confirm('Delete this project?');">
+                        🗑 Delete
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        {% else %}
+        <p class="empty">No projects added yet.</p>
+        {% endfor %}
+    </div>
+
+</main>
+
+</body>
+</html>

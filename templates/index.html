@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darshan R | Data Analyst</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<!-- 🔥 FLASH MESSAGES (FIXED POSITION) -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<!-- 🔹 NAVBAR -->
+<nav class="navbar">
+    <h2 class="logo">Darshan R • Data Analyst</h2>
+    <div class="nav-links">
+        <a href="#" onclick="goHome(event)">Home</a>
+        <a href="#" onclick="showProjects(event)">Projects</a>
+        <a href="#" onclick="showCertificates(event)">Certificates</a>
+       <a href="/download-resume" class="resume-btn">Download Resume</a>
+        <a href="/login" class="btn">Admin</a>
+         <button id="themeToggle" class="btn">🌙</button>
+    </div>
+</nav>
+
+<!-- 🔹 HERO -->
+<section class="hero">
+
+<div class="hero-text">
+    {% if profile %}
+        <h1>{{ profile[1] }}</h1>
+        <p class="aspiring-text">Data Analyst | Python • SQL • Power BI</p>
+        <p class="role highlight-role">{{ profile[2] }}</p>
+        <p class="bio">{{ profile[3] }}</p>
+    {% else %}
+        <h1>Your Name</h1>
+        <p>Your Role</p>
+        <p>Your bio will appear here</p>
+    {% endif %}
+
+    <div class="hero-buttons">
+        <button id="btn-projects" class="btn btn-main active-btn" onclick="showProjects(event)">
+            View Projects
+        </button>
+
+        <button id="btn-certificates" class="btn btn-main" onclick="showCertificates(event)">
+            View Certificates
+        </button>
+    </div>
+
+  <div class="social-links">
+
+    {% if profile and profile|length > 6 and profile[6] %}
+        <a href="{{ profile[6] }}" target="_blank" class="social-icon linkedin">
+            <i class="fab fa-linkedin-in"></i>
+        </a>
+    {% endif %}
+
+    {% if profile and profile|length > 7 and profile[7] %}
+        <a href="{{ profile[7] }}" target="_blank" class="social-icon github">
+            <i class="fab fa-github"></i>
+        </a>
+    {% endif %}
+
+    {% if profile and profile|length > 8 and profile[8] %}
+        <a href="{{ profile[8] }}" target="_blank" class="social-icon instagram">
+            <i class="fab fa-instagram"></i>
+        </a>
+    {% endif %}
+
+</div>
+</div>
+
+<div class="hero-image">
+    {% if profile and profile|length > 4 and profile[4] %}
+        <img src="{{ url_for('static', filename='uploads/' + profile[4]) }}" alt="Profile Image">
+    {% else %}
+        <img src="{{ url_for('static', filename='default.png') }}" alt="Default Image">
+    {% endif %}
+</div>
+
+</section>
+
+<!-- 🔹 SKILLS -->
+<section class="skills-section">
+    <h2>Skills</h2>
+
+    {% if profile and profile|length > 5 and profile[5] %}
+        <div class="skills-container">
+
+            {% set raw_skills = profile[5]
+                .replace('\n', ',')
+                .replace('•', ',')
+                .replace('-', ',')
+            %}
+
+            {% for skill in raw_skills.split(',') %}
+                {% if skill.strip() %}
+                    <span class="skill-tag">{{ skill.strip() }}</span>
+                {% endif %}
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <p>Add your skills...</p>
+    {% endif %}
+</section>
+
+<!-- 🔹 PROJECTS -->
+<section id="projects-section" class="projects hidden-section">
+    <h2>📊Projects</h2>
+
+    <div class="grid">
+        {% for p in projects %}
+        <div class="card">
+            <h3>{{ p[1] }}</h3>
+            <p>{{ p[2] }}</p>
+
+            <div class="tags">
+                <span>{{ p[3] }}</span>
+            </div>
+
+            {% if p[4] %}
+                <a href="{{ p[4] }}" target="_blank" class="link-btn">View Project →</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 🔹 CERTIFICATES -->
+<section id="certificates-section" class="projects hidden-section">
+    <h2>🎓 Certificates</h2>
+
+    <div class="cert-grid">
+        {% for c in certificates %}
+        <div class="cert-card">
+
+            {% if c[3] %}
+            <a href="{{ url_for('static', filename='uploads/' + c[3]) }}" target="_blank">
+                <img src="{{ url_for('static', filename='uploads/' + c[3]) }}" class="cert-img">
+            </a>
+            {% endif %}
+
+            <h4>{{ c[1] }}</h4>
+            <p>{{ c[2] }}</p>
+
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 🔹 CONTACT -->
+<section class="contact-section">
+    <h2>Contact</h2>
+
+    <div class="contact-container">
+
+        <div class="contact-info">
+
+    <div class="contact-item">
+    <i class="fas fa-envelope"></i>
+    <div>
+        <span>Email</span>
+        <a href="mailto:{{ profile[9] }}">{{ profile[9] }}</a>
+    </div>
+</div>
+
+<div class="contact-item">
+    <i class="fas fa-location-dot"></i>
+    <div>
+        <span>Location</span>
+        <p>{{ profile[10] }}</p>
+    </div>
+</div>
+
+<div class="contact-item">
+    <i class="fas fa-briefcase"></i>
+    <div>
+        <span>Status</span>
+        <p>{{ profile[11] }}</p>
+    </div>
+</div>
+
+</div>
+
+        <form class="contact-form" method="POST" action="/contact">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <textarea name="message" placeholder="Your Message" required></textarea>
+
+            <button type="submit" class="btn btn-main">Contact Me</button>
+        </form>
+
+    </div>
+</section>
+
+<!-- 🔹 FOOTER -->
+<footer>
+    <p>© 2026 Darshan R | Data Analyst</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+
+</body>
+</html>

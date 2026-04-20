@@ -1,0 +1,248 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* BODY */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: #020617;
+    border-bottom: 1px solid #1e293b;
+}
+
+.navbar h2 {
+    font-size: 20px;
+}
+
+/* BUTTONS */
+.btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    background: #334155;
+    color: white;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.btn.primary {
+    background: #3b82f6;
+}
+
+.btn.edit {
+    background: #22c55e;
+}
+
+.btn.danger {
+    background: #ef4444;
+}
+
+/* CONTAINER */
+.container {
+    padding: 40px;
+    max-width: 900px;
+    margin: auto;
+}
+
+/* HEADER */
+.header-section {
+    margin-bottom: 25px;
+}
+
+.header-section h3 {
+    font-size: 24px;
+}
+
+.header-section p {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+/* PROJECT CARD */
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.project-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    padding: 18px;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+.project-card:hover {
+    transform: scale(1.01);
+    background: #273449;
+}
+
+.project-content h4 {
+    margin-bottom: 5px;
+}
+
+.project-content p {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+/* ACTIONS */
+.project-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* EMPTY STATE */
+.empty {
+    text-align: center;
+    color: #64748b;
+}
+.btn.primary {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+}
+
+.btn.primary:hover {
+    transform: translateY(-2px);
+}
+/* 🔹 BASE BUTTON */
+.btn {
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    transition: 0.3s;
+}
+
+/* 🟢 PRIMARY (MAIN ACTION) */
+.btn.primary {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(34,197,94,0.4);
+}
+
+.btn.primary:hover {
+    transform: translateY(-2px);
+}
+
+/* 🔵 SECONDARY */
+.btn.secondary {
+    background: #d112c1;
+    border: 1px solid #334155;
+}
+
+.btn.secondary:hover {
+    background: #b323b0;
+}
+
+/* 🔴 DANGER */
+.btn.danger {
+    background: #ef4444;
+}
+
+.btn.danger:hover {
+    background: #dc2626;
+}
+.upload-btn {
+    display: inline-block;
+    padding: 10px 22px;
+    background: #007bff;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.upload-btn:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+.upload {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.upload:hover {
+    background: linear-gradient(135deg, #fb8c00, #e64a19);
+}
+.nav-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+/* 🔹 BASE TOAST */
+.toast {
+    position: fixed;
+    top: 70px;   /* ⬅️ move below navbar */
+    right: 20px;
+
+    padding: 12px 18px;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 9999;
+
+    animation: slideIn 0.3s ease, fadeOut 3s forwards;
+}
+
+/* 🟢 SUCCESS */
+.toast.success {
+    background: linear-gradient(135deg, #22c55e, #16a34a); /* 🟢 */
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626); /* 🔴 */
+}
+
+/* 🔹 ANIMATIONS */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    80% { opacity: 1; }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}

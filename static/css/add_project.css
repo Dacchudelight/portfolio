@@ -1,0 +1,135 @@
+/* 🔹 RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 🔹 BODY (same as admin.css) */
+body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+/* 🔹 NAVBAR (optional reuse) */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: #1e293b;
+}
+
+/* 🔹 FORM CONTAINER */
+.form-container {
+    max-width: 500px;
+    margin: 60px auto;
+    padding: 25px;
+    background: #1e293b;
+    border-radius: 10px;
+}
+
+/* 🔹 TITLE */
+.form-container h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 🔹 FORM */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 🔹 INPUTS */
+.form input,
+.form textarea {
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    background: #334155;
+    color: white;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+/* 🔹 PLACEHOLDER */
+.form input::placeholder,
+.form textarea::placeholder {
+    color: #94a3b8;
+}
+
+/* 🔹 FOCUS */
+.form input:focus,
+.form textarea:focus {
+    background: #475569;
+}
+
+/* 🔹 BUTTON (same style as admin.css) */
+.btn {
+    text-decoration: none;
+    padding: 10px;
+    background: #334155;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #475569;
+}
+
+.primary {
+    background: #22c55e;
+    color: black;
+}
+
+.primary:hover {
+    background: #16a34a;
+}
+/* 🔹 TOP RIGHT NAV */
+.top-bar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+/* BUTTON GROUP */
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* COMMON BUTTON */
+.btn {
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+}
+
+/* HOME BUTTON */
+.home-btn {
+    background: #06b6d4;
+}
+
+.home-btn:hover {
+    background: #0891b2;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    background: #64748b;
+}
+
+.back-btn:hover {
+    background: #475569;
+}
