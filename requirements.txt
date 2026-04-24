@@ -1,7 +1,9 @@
 Flask==3.1.2
 gunicorn==25.3.0
-Flask-Login==0.6.3
+cloudinary==1.44.2
+psycopg2-binary==2.9.12
 Flask-Mail==0.10.0
+Flask-Login==0.6.3
 Flask-SQLAlchemy==3.1.1
 python-dotenv==1.2.1
-psycopg2-binary
+requests==2.32.5
