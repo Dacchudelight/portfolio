@@ -84,3 +84,18 @@ function downloadResume(e) {
     link.click();
 }
 
+
+const eduLink = document.getElementById("eduLink");
+const eduSection = document.getElementById("education");
+
+eduLink.addEventListener("click", function(e) {
+    e.preventDefault();
+
+    // Show section
+    eduSection.style.display = "block";
+
+    // Smooth scroll
+    eduSection.scrollIntoView({
+        behavior: "smooth"
+    });
+});

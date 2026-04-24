@@ -11,12 +11,12 @@
 <!-- 🔹 TOP NAVBAR -->
 <div class="top-bar">
     <div class="nav-left">
-        <span class="page-title"> Upload Resume</span>
+        <span class="page-title">📄 Upload Resume</span>
     </div>
 
     <div class="nav-right">
         <a href="/" class="nav-btn home-btn">Home</a>
-        <a href="/admin" class="nav-btn dashboard-btn">Admin panel</a>
+        <a href="/admin" class="nav-btn dashboard-btn">Admin Panel</a>
     </div>
 </div>
 
@@ -37,7 +37,10 @@
     <!-- 🔥 CURRENT RESUME STATUS -->
     {% if current_resume %}
         <div class="current-file">
-             Current Resume: <strong>{{ current_resume }}</strong>
+             Current Resume:
+             <a href="{{ current_resume }}" target="_blank">
+                 View Resume
+             </a>
         </div>
     {% else %}
         <div class="current-file no-file">
@@ -55,7 +58,7 @@
 
 </div>
 
-<!-- 🔹 AUTO HIDE TOAST -->
+<!-- 🔹 AUTO HIDE MESSAGE -->
 <script>
 setTimeout(() => {
     const msg = document.querySelector('.flash-msg');

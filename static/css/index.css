@@ -1317,3 +1317,253 @@ body.light-theme .btn-download:hover {
     background: transparent;
     color: #cebf53 !important;
 }   
+/* ===== EDUCATION SECTION FINAL FIX ===== */
+
+#education {
+    padding: 80px 20px;
+}
+
+/* RESET ONLY INSIDE EDUCATION */
+#education * {
+    box-sizing: border-box;
+}
+
+/* TITLE */
+#education .section-title {
+    text-align: center;
+    width: 100%;
+}
+
+/* CONTAINER */
+#education .education-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* BOX */
+#education .education-box {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transition: 0.3s ease;
+}
+
+#education .education-box:hover {
+    transform: translateY(-4px);
+}
+
+/* ICON */
+#education .edu-icon {
+    min-width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #22d3ee, #3b82f6);
+    border-radius: 10px;
+    font-size: 18px;
+    color: black;
+}
+
+/* CONTENT */
+#education .edu-content h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+#education .edu-institution {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+#education .edu-year {
+    font-size: 13px;
+    color: #22d3ee;
+}
+
+#education .edu-desc {
+    font-size: 13px;
+    color: #cbd5f5;
+    margin-top: 5px;
+}
+.education-section {
+    padding: 80px 20px;
+    background: #0b1220;
+    color: #fff;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 32px;
+    margin-bottom: 40px;
+    font-weight: 600;
+    position: relative;
+}
+
+.section-title::after {
+    content: "";
+    width: 60px;
+    height: 3px;
+    background: #00d4ff;
+    display: block;
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+.education-container {
+    max-width: 900px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.education-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #162033;
+    padding: 20px 25px;
+    border-radius: 12px;
+    transition: 0.3s ease;
+}
+
+.education-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.edu-left {
+    text-align: left;
+}
+
+.edu-left h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.edu-institution {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.edu-right {
+    font-size: 14px;
+    color: #cbd5e1;
+    font-weight: 500;
+}
+html {
+    scroll-behavior: smooth;
+}
+#education {
+    scroll-margin-top: 100px; /* adjust based on navbar height */
+}
+.edu-desc {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.5;
+    max-width: 500px;
+}
+.education-container {
+    max-width: 800px;
+    margin: 0 auto;   /* centers horizontally */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+/* ===== PERFECT EDUCATION SECTION ===== */
+
+#education {
+    padding: 30px 20px 60px;   /* 👈 less top space */
+    text-align: center;
+}
+
+/* TITLE */
+#education .section-title {
+    font-size: 28px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* underline center fix */
+#education .section-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* CONTAINER */
+.education-container {
+    max-width: 750px;   /* 👈 PERFECT WIDTH */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* CARD */
+.education-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 18px 22px;
+    border-radius: 14px;
+
+    background: #162033;
+
+    transition: 0.3s ease;
+}
+
+/* hover effect like your UI */
+.education-box:hover {
+    transform: translateY(-3px);
+}
+
+/* LEFT SIDE */
+.edu-left {
+    text-align: left;
+}
+
+/* RIGHT SIDE (year) */
+.edu-right {
+    font-size: 14px;
+    color: #22d3ee;
+    font-weight: 500;
+}
+#education {
+    display: none;
+}
+/* 🌞 FORCE FIX EDUCATION LIGHT MODE */
+body.light-theme #education {
+    background: var(--bg-alt) !important;
+}
+
+body.light-theme .education-box {
+    background: #ffffff !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+body.light-theme .education-box:hover {
+    box-shadow: var(--shadow-md) !important;
+}
+
+body.light-theme .edu-left h3 {
+    color: var(--text-primary) !important;
+}
+
+body.light-theme .edu-institution {
+    color: var(--text-muted) !important;
+}
+
+body.light-theme .edu-right {
+    color: var(--primary) !important;
+}

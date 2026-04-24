@@ -9,30 +9,33 @@
 <body>
 
 <div class="container">
+
     <!-- 🔹 NAV BUTTONS -->
-<div class="nav-buttons">
-    <a href="/" class="btn home-btn">🏠 Home</a>
-    <a href="/admin" class="btn back-btn">⬅ Back</a>
-</div>
+    <div class="nav-buttons">
+        <a href="/" class="btn home-btn">🏠 Home</a>
+        <a href="{{ url_for('admin') }}" class="btn back-btn">⬅ Back</a>
+    </div>
 
     <h2>Edit Project</h2>
 
     <!-- 🔹 FLASH MESSAGE -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="toast {{ category }}">
-          <span class="icon">
-              {% if category == 'success' %}✔{% else %}❌{% endif %}
-          </span>
-          <span class="msg">{{ message }}</span>
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="toast-container">
+          {% for category, message in messages %}
+            <div class="toast {{ category }}">
+                <span class="icon">
+                    {% if category == 'success' %}✔{% else %}❌{% endif %}
+                </span>
+                <span class="msg">{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
     <!-- 🔹 FORM -->
-    <form method="POST" action="/update_project/{{ project[0] }}">
+    <form method="POST" action="{{ url_for('update_project', id=project[0]) }}">
 
         <label>Title</label>
         <input type="text" name="title" value="{{ project[1] }}" required>
@@ -44,16 +47,34 @@
         <input type="text" name="tools" value="{{ project[3] }}">
 
         <label>Project Link</label>
-        <input type="text" name="link" value="{{ project[4] }}">
+        <input type="text" name="link" value="{{ project[4] or '' }}" placeholder="https://example.com">
 
-        <button type="submit">Update Project</button>
+        <button type="submit" id="submitBtn">Update Project</button>
 
     </form>
 
 </div>
 
-<!-- 🔹 LINK JS FILE -->
-<script src="{{ url_for('static', filename='js/edit_project.js') }}"></script>
+<!-- 🔥 AUTO HIDE TOAST -->
+<script>
+setTimeout(() => {
+    document.querySelectorAll('.toast').forEach(el => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+    });
+}, 2500);
+</script>
+
+<!-- 🔹 OPTIONAL LOADING UX -->
+<script>
+const form = document.querySelector("form");
+const btn = document.getElementById("submitBtn");
+
+form.addEventListener("submit", () => {
+    btn.innerText = "Updating...";
+    btn.disabled = true;
+});
+</script>
 
 </body>
 </html>

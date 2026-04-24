@@ -14,7 +14,7 @@
     <h2>✏️ Edit Certificate</h2>
 
     <div class="nav-buttons">
-        <a href="/certificates" class="btn">← Back</a>
+        <a href="{{ url_for('certificates_page') }}" class="btn">← Back</a>
     </div>
 </header>
 
@@ -24,7 +24,7 @@
     <div class="form-card">
         <h3>Update Certificate</h3>
 
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" action="{{ url_for('edit_certificate', id=cert[0]) }}" enctype="multipart/form-data">
 
             <label>Certificate Title</label>
             <input type="text" name="title" value="{{ cert[1] }}" required>
@@ -35,14 +35,16 @@
             <label>Update Image (optional)</label>
             <input type="file" name="image" accept="image/*" onchange="previewImage(event)">
 
-            <!-- 🔹 Current Image -->
-            {% if cert[3] %}
-            <p style="margin-top:10px;">Current Image:</p>
-            <img src="{{ url_for('static', filename='uploads/' + cert[3]) }}" class="preview-img" style="display:block;">
+            <!-- 🔹 Current Image (Cloudinary) -->
+            {% if cert[3] and cert[3].startswith('http') %}
+                <p style="margin-top:10px;">Current Image:</p>
+                <img src="{{ cert[3] }}" class="preview-img" style="display:block;">
+            {% else %}
+                <p style="margin-top:10px; color:red;">No valid image</p>
             {% endif %}
 
             <!-- 🔹 New Preview -->
-            <img id="preview" class="preview-img">
+            <img id="preview" class="preview-img" style="display:none;">
 
             <button type="submit" class="btn primary">💾 Update Certificate</button>
 
@@ -55,8 +57,12 @@
 <script>
 function previewImage(event) {
     const img = document.getElementById('preview');
-    img.src = URL.createObjectURL(event.target.files[0]);
-    img.style.display = 'block';
+    const file = event.target.files[0];
+
+    if (file) {
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
+    }
 }
 </script>
 

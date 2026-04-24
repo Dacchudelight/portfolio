@@ -233,3 +233,24 @@ button:hover {
         transform: translateY(-8px);
     }
 }
+/* Loading state */
+.btn.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Optional spinner */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    margin-left: 8px;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

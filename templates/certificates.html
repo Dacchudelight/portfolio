@@ -15,18 +15,16 @@
   {% endif %}
 {% endwith %}
 
-<!-- 🔹 NAVBAR -->
 <header class="navbar">
     <h2>🎓 Certificates</h2>
 
     <div class="nav-buttons">
         <a href="/" class="btn home-btn">🏠 Home</a>
         <a href="/admin" class="btn back-btn">⬅ Back</a>
-        <a href="/add_certificate" class="btn primary">+ Add Certificate</a>
+        <a href="{{ url_for('add_certificate') }}" class="btn primary">+ Add Certificate</a>
     </div>
 </header>
 
-<!-- 🔹 CONTENT -->
 <main class="container">
 
     <div class="header-section">
@@ -42,8 +40,15 @@
             <div class="project-card">
 
                 <div class="project-content">
-                    {% if c[3] %}
-                    <img src="{{ url_for('static', filename='uploads/' + c[3]) }}" class="cert-img">
+
+                    {% if c[3] and c[3].startswith('http') %}
+                        <!-- ✅ Cloudinary URL -->
+                        <a href="{{ c[3] }}" target="_blank">
+                            <img src="{{ c[3] }}" class="cert-img">
+                        </a>
+                    {% else %}
+                        <!-- ❌ Invalid data -->
+                        <p style="color:red;">Invalid image URL</p>
                     {% endif %}
 
                     <h4>{{ c[1] }}</h4>
@@ -51,10 +56,10 @@
                 </div>
 
                 <div class="project-actions">
-                    <a href="/edit_certificate/{{ c[0] }}" class="btn edit">✏️ Edit</a>
+                    <a href="{{ url_for('edit_certificate', id=c[0]) }}" class="btn edit">✏️ Edit</a>
 
-                    <form action="/delete_certificate/{{ c[0] }}" method="POST">
-                        <button class="btn danger"
+                    <form action="{{ url_for('delete_certificate', id=c[0]) }}" method="POST">
+                        <button type="submit" class="btn danger"
                             onclick="return confirm('Delete this certificate?');">
                             🗑 Delete
                         </button>

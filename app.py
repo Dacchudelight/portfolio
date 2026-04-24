@@ -1,179 +1,75 @@
-from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask import Flask, render_template, request, redirect, session, url_for, flash, send_file
 from flask_mail import Mail, Message
-import sqlite3
 import os
-from flask import send_file
-import io
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+from dotenv import load_dotenv
+import requests
+from io import BytesIO
+import psycopg2
+import os
+from werkzeug.security import generate_password_hash, check_password_hash
+
+print(os.environ.get("DATABASE_URL"))
+
+# ✅ PostgreSQL connection
+def get_db_connection():
+    return psycopg2.connect(
+        os.environ.get("DATABASE_URL"),
+        sslmode="require"
+    )
+def is_logged_in():
+    return "user" in session
+
+# Load environment variables
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = "secret123"
+app.secret_key = os.getenv("SECRET_KEY")
+
+@app.after_request
+def add_header(response):
+    response.cache_control.no_store = True
+    return response
 
 # 🔹 MAIL CONFIG
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'darshan5939r@gmail.com'   # your email
-app.config['MAIL_PASSWORD'] = 'kfavsmpypufipkyd'        # NOT your normal password
+app.config['MAIL_USERNAME'] = os.environ.get("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.environ.get("MAIL_PASSWORD")
 
 mail = Mail(app)
 
-# ---------------- DATABASE ----------------
-def init_db():
-    conn = sqlite3.connect("database.db", timeout=5)
-    c = conn.cursor()
+# 🔹 CLOUDINARY CONFIG
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUD_NAME"),
+    api_key=os.environ.get("API_KEY"),
+    api_secret=os.environ.get("API_SECRET")
+)
 
-    # 🔹 USERS TABLE
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        username TEXT,
-        password TEXT
-    )
-    """)
-
-    # 🔹 PROJECTS TABLE
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS projects (
-        id INTEGER PRIMARY KEY,
-        title TEXT,
-        description TEXT,
-        tools TEXT,
-        link TEXT
-    )
-    """)
-
-    # 🔹 CERTIFICATES TABLE
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS certificates (
-        id INTEGER PRIMARY KEY,
-        title TEXT,
-        issuer TEXT,
-        image TEXT
-    )
-    """)
-
-    # 🔹 PROFILE TABLE (BASE STRUCTURE)
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS profile (
-        id INTEGER PRIMARY KEY,
-        name TEXT,
-        role TEXT,
-        bio TEXT,
-        image TEXT
-    )
-    """)
-
-    # 🔹 RESUME TABLE (ONLY ONE ROW)
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS resume (
-        id INTEGER PRIMARY KEY,
-        filename TEXT
-    )
-    """)
-
-    # ensure only one resume row exists
-    c.execute("SELECT * FROM resume WHERE id=1")
-    if not c.fetchone():
-        c.execute("INSERT INTO resume (id, filename) VALUES (1, '')")
-
-    # 🔥 ADD NEW COLUMNS SAFELY
-    def add_column_if_not_exists(column_name):
-        c.execute("PRAGMA table_info(profile)")
-        columns = [col[1] for col in c.fetchall()]
-        if column_name not in columns:
-            c.execute(f"ALTER TABLE profile ADD COLUMN {column_name} TEXT")
-
-    # EXISTING
-    add_column_if_not_exists("skills")
-    add_column_if_not_exists("linkedin")
-    add_column_if_not_exists("github")
-    add_column_if_not_exists("instagram")
-
-    # 🔥 NEW CONTACT FIELDS
-    add_column_if_not_exists("email")
-    add_column_if_not_exists("location")
-    add_column_if_not_exists("status")
-
-    # 🔥 ENSURE ONLY ONE PROFILE ROW
-    c.execute("SELECT * FROM profile")
-    rows = c.fetchall()
-
-    TOTAL_COLS = 12
-
-    if len(rows) == 0:
-        c.execute("""
-        INSERT INTO profile 
-        (id, name, role, bio, image, skills, linkedin, github, instagram, email, location, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            1,
-            'Your Name',
-            'Your Role',
-            'Your bio',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            ''
-        ))
-
-    elif len(rows) > 1:
-        first = rows[0]
-        c.execute("DELETE FROM profile")
-
-        data = list(first) + [""] * (TOTAL_COLS - len(first))
-
-        c.execute("""
-        INSERT INTO profile 
-        (id, name, role, bio, image, skills, linkedin, github, instagram, email, location, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, data[:TOTAL_COLS])
-
-    else:
-        if rows[0][0] != 1:
-            first = rows[0]
-            c.execute("DELETE FROM profile")
-
-            data = list(first) + [""] * (TOTAL_COLS - len(first))
-
-            c.execute("""
-            INSERT INTO profile 
-            (id, name, role, bio, image, skills, linkedin, github, instagram, email, location, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (1, *data[1:TOTAL_COLS]))
-
-    # 🔹 DEFAULT ADMIN USER
-    c.execute("SELECT * FROM users WHERE username='admin'")
-    if not c.fetchone():
-        c.execute(
-            "INSERT INTO users (username, password) VALUES (?, ?)",
-            ("admin", "admin123")
-        )
-
-    conn.commit()
-    conn.close()
-
-# ---------------- ROUTES ----------------
-
-def is_logged_in():
-    return "user" in session
 
 @app.route("/")
 def home():
-    conn = sqlite3.connect("database.db")
+    conn = get_db_connection()
     c = conn.cursor()
 
-    c.execute("SELECT * FROM projects")
+    # Fetch projects
+    c.execute("SELECT * FROM projects ORDER BY id DESC")
     projects = c.fetchall()
 
-    c.execute("SELECT * FROM certificates")
+    # Fetch certificates
+    c.execute("SELECT * FROM certificates ORDER BY id DESC")
     certificates = c.fetchall()
 
-    # 🔥 ADD PROFILE
-    c.execute("SELECT * FROM profile WHERE id=1")
+    # Fetch profile
+    c.execute("SELECT * FROM profile WHERE id=%s", (1,))
     profile = c.fetchone()
+
+    # Fetch education
+    c.execute("SELECT * FROM education ORDER BY id DESC")
+    education = c.fetchall()
 
     conn.close()
 
@@ -181,29 +77,45 @@ def home():
         "index.html",
         projects=projects,
         certificates=certificates,
-        profile=profile
+        profile=profile,
+        education=education
     )
-
-
-from flask import flash, session
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = request.form["username"]
-        pwd = request.form["password"]
+        user = request.form.get("username")
+        pwd = request.form.get("password")
 
-        conn = sqlite3.connect("database.db")
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=? AND password=?", (user, pwd))
-        result = c.fetchone()
-        conn.close()
+        # 🔹 Basic validation
+        if not user or not pwd:
+            flash("Username and password are required", "error")
+            return redirect("/login")
+
+        try:
+            conn = get_db_connection()
+            c = conn.cursor()
+
+            c.execute(
+                "SELECT * FROM users WHERE username=%s AND password=%s",
+                (user, pwd)
+            )
+            result = c.fetchone()
+
+        except Exception as e:
+            print("DB Error:", e)
+            flash("Something went wrong. Try again.", "error")
+            return redirect("/login")
+
+        finally:
+            conn.close()
 
         if result:
             session["user"] = user
+            flash("Login successful", "success")
             return redirect("/admin")
         else:
-            flash("Invalid username or password")   
+            flash("Invalid username or password", "error")
 
     return render_template("login.html")
 
@@ -212,13 +124,24 @@ def admin():
     if "user" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("database.db")
+    conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT * FROM projects")
+
+    # 🔹 Projects
+    c.execute("SELECT * FROM projects ORDER BY id DESC")
     projects = c.fetchall()
+
+    # 🔹 Education
+    c.execute("SELECT * FROM education ORDER BY id DESC")
+    education = c.fetchall()
+
     conn.close()
 
-    return render_template("admin.html", projects=projects)
+    return render_template(
+        "admin.html",
+        projects=projects,
+        education=education
+    )
 
 
 @app.route('/add_project', methods=['GET', 'POST'])
@@ -239,20 +162,18 @@ def add_project():
                 flash("Title and Description are required!", "error")
                 return redirect('/add_project')
 
-            conn = sqlite3.connect('database.db')
+            conn = get_db_connection()
             cursor = conn.cursor()
 
             cursor.execute("""
                 INSERT INTO projects (title, description, tools, link)
-                VALUES (?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s)
             """, (title, description, tools, link))
 
             conn.commit()
             conn.close()
 
-            # 🟢 GREEN SUCCESS MESSAGE
             flash("Project added successfully!", "success")
-
             return redirect('/admin')
 
         except Exception as e:
@@ -262,55 +183,113 @@ def add_project():
 
     return render_template('add_project.html')
 
+@app.route("/delete_project/<int:id>", methods=["POST"])
+def delete_project(id):
+    if not is_logged_in():
+        return redirect("/login")
+
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+
+        c.execute("DELETE FROM projects WHERE id=%s", (id,))
+        conn.commit()
+
+        flash("Project deleted successfully!", "success")
+
+    except Exception as e:
+        print("Delete Project Error:", e)
+        flash("Failed to delete project", "error")
+
+    finally:
+        conn.close()
+
+    return redirect("/admin")
+
+@app.route("/admin/add_education", methods=["GET", "POST"])
+def add_education():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    if request.method == "POST":
+        c.execute(
+            "INSERT INTO education (degree, institution, year, description) VALUES (%s, %s, %s, %s)",
+            (
+                request.form["degree"],
+                request.form["institution"],
+                request.form["year"],
+                request.form["description"]
+            )
+        )
+        conn.commit()
+        conn.close()
+
+        flash("Education added successfully!", "success")
+
+        # ✅ PRG pattern (keep this)
+        return redirect(url_for("add_education"))
+
+    # ✅ GET request → fetch data
+    c.execute("SELECT * FROM education ORDER BY id DESC")
+    education = c.fetchall()
+
+    conn.close()
+
+    return render_template("add_education.html", education=education)
+
+
 @app.route("/logout")
 def logout():
     session.pop("user", None)
     return redirect("/")
 
-from flask import flash, redirect
-import sqlite3
 
-@app.route('/delete_project/<int:id>', methods=['POST'])
-def delete_project(id):
-    if not is_logged_in():
-        return redirect('/login')
+@app.route("/admin/edit_education/<int:id>", methods=["GET", "POST"])
+def edit_education(id):
+    if "user" not in session:
+        return redirect("/login")
 
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
+    conn = get_db_connection()
+    c = conn.cursor()
 
-    try:
-        cursor.execute("DELETE FROM projects WHERE id=?", (id,))
+    # Get existing data
+    c.execute("SELECT * FROM education WHERE id=%s", (id,))
+    edu = c.fetchone()
+
+    if not edu:
+        conn.close()
+        return "Education not found", 404
+
+    if request.method == "POST":
+        degree = request.form.get("degree")
+        institution = request.form.get("institution")
+        year = request.form.get("year")
+        description = request.form.get("description")
+
+        # 🔍 Basic validation
+        if not degree or not institution or not year:
+            flash("All fields except description are required", "error")
+            return render_template("edit_education.html", edu=edu)
+
+        c.execute("""
+            UPDATE education 
+            SET degree=%s, institution=%s, year=%s, description=%s 
+            WHERE id=%s
+        """, (degree, institution, year, description, id))
+
         conn.commit()
-
-        # 🔴 RED (correct for delete)
-        flash("Project deleted successfully!", "error")
-
-    except Exception as e:
-        print("Delete error:", e)
-        flash("Failed to delete project!", "error")
-
-    finally:
         conn.close()
 
-    return redirect('/admin')   
+        flash("Education updated successfully!", "success")
 
-@app.route('/edit_project/<int:id>')
-def edit_project(id):
-    if not is_logged_in():
-        return redirect('/login')
-
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM projects WHERE id=?", (id,))
-    project = cursor.fetchone()
+        return redirect(url_for("add_education"))
 
     conn.close()
+    return render_template("edit_education.html", edu=edu)
 
-    if not project:
-        return "Project not found", 404
-
-    return render_template('edit_project.html', project=project)
 
 @app.route('/update_project/<int:id>', methods=['POST'])
 def update_project(id):
@@ -327,13 +306,13 @@ def update_project(id):
             flash("Title and Description are required!", "error")
             return redirect(url_for('edit_project', id=id))
 
-        conn = sqlite3.connect('database.db')
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
             UPDATE projects 
-            SET title=?, description=?, tools=?, link=? 
-            WHERE id=?
+            SET title=%s, description=%s, tools=%s, link=%s 
+            WHERE id=%s
         """, (title, description, tools, link, id))
 
         conn.commit()
@@ -342,139 +321,231 @@ def update_project(id):
         flash("Project updated successfully", "success")
 
     except Exception as e:
+        print("Update Error:", e)
         flash("Failed to update project", "error")
 
     return redirect(url_for('edit_project', id=id))
 
+@app.route('/edit_project/<int:id>')
+def edit_project(id):
+    if not is_logged_in():
+        return redirect('/login')
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM projects WHERE id=%s", (id,))
+    project = c.fetchone()
+
+    conn.close()
+
+    if not project:
+        return "Project not found", 404
+
+    return render_template('edit_project.html', project=project)
+
 @app.route("/certificates")
 def certificates_page():
     if "user" not in session:
+        flash("Please login first", "error")
         return redirect("/login")
 
-    conn = sqlite3.connect("database.db")
-    c = conn.cursor()
-    c.execute("SELECT * FROM certificates")
-    certificates = c.fetchall()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM certificates ORDER BY id DESC")
+        certificates = c.fetchall()
+
+    except Exception as e:
+        certificates = []
+        print("DB Error:", e)
+        flash("Failed to load certificates", "error")
+
+    finally:
+        conn.close()
 
     return render_template("certificates.html", certificates=certificates)
-
-
-UPLOAD_FOLDER = "static/uploads"
-
-# ensure folder exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-import uuid
 
 @app.route("/add_certificate", methods=["GET", "POST"])
 def add_certificate():
     if "user" not in session:
+        flash("Please login first", "error")
         return redirect("/login")
 
     if request.method == "POST":
-        title = request.form["title"]
-        issuer = request.form["issuer"]
-        file = request.files["image"]
+        title = request.form.get("title")
+        issuer = request.form.get("issuer")
+        file = request.files.get("image")
 
-        filename = ""
+        # 🔹 Basic validation
+        if not title or not issuer:
+            flash("Title and Issuer are required", "error")
+            return redirect("/add_certificate")
 
-        if file and file.filename != "":
-            filename = str(uuid.uuid4()) + "_" + file.filename
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
+        if not file or file.filename == "":
+            flash("Please upload an image", "error")
+            return redirect("/add_certificate")
 
-        conn = sqlite3.connect("database.db")
-        c = conn.cursor()
-        c.execute(
-            "INSERT INTO certificates (title, issuer, image) VALUES (?, ?, ?)",
-            (title, issuer, filename)
-        )
-        conn.commit()
-        conn.close()
+        # 🔹 File type validation
+        if not file.mimetype.startswith("image/"):
+            flash("Only image files are allowed", "error")
+            return redirect("/add_certificate")
 
-        flash("Certificate added successfully!")   # ✅ ADD THIS
-        return redirect("/certificates")
+        try:
+            # 🔹 Upload to Cloudinary (UNCHANGED)
+            upload_result = cloudinary.uploader.upload(
+                file,
+                folder="certificates"
+            )
+            image_url = upload_result["secure_url"]
+
+            # ✅ PostgreSQL connection
+            conn = get_db_connection()
+            c = conn.cursor()
+
+            c.execute(
+                "INSERT INTO certificates (title, issuer, image) VALUES (%s, %s, %s)",
+                (title, issuer, image_url)
+            )
+
+            conn.commit()
+            conn.close()
+
+            flash("Certificate added successfully!", "success")
+            return redirect("/certificates")
+
+        except Exception as e:
+            print("Upload Error:", e)
+            flash("Failed to upload certificate", "error")
+            return redirect("/add_certificate")
 
     return render_template("add_certificate.html")
 
 @app.route("/edit_certificate/<int:id>", methods=["GET", "POST"])
 def edit_certificate(id):
     if "user" not in session:
+        flash("Please login first", "error")
         return redirect("/login")
 
-    conn = sqlite3.connect("database.db")
+    conn = get_db_connection()
     c = conn.cursor()
 
+    # 🔹 Check if certificate exists
+    c.execute("SELECT * FROM certificates WHERE id=%s", (id,))
+    cert = c.fetchone()
+
+    if not cert:
+        conn.close()
+        flash("Certificate not found", "error")
+        return redirect("/certificates")
+
     if request.method == "POST":
-        title = request.form["title"]
-        issuer = request.form["issuer"]
+        title = request.form.get("title")
+        issuer = request.form.get("issuer")
         file = request.files.get("image")
 
-        # get old image
-        c.execute("SELECT image FROM certificates WHERE id=?", (id,))
-        old_image = c.fetchone()[0]
+        # 🔹 Basic validation
+        if not title or not issuer:
+            flash("Title and Issuer are required", "error")
+            return redirect(url_for("edit_certificate", id=id))
 
-        filename = old_image
+        image_url = cert[3]  # existing image
 
+        # 🔹 If new file uploaded (UNCHANGED)
         if file and file.filename != "":
-            filename = str(uuid.uuid4()) + "_" + file.filename
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
+            if not file.mimetype.startswith("image/"):
+                flash("Only image files are allowed", "error")
+                return redirect(url_for("edit_certificate", id=id))
 
-        c.execute("""
-            UPDATE certificates 
-            SET title=?, issuer=?, image=? 
-            WHERE id=?
-        """, (title, issuer, filename, id))
+            try:
+                upload_result = cloudinary.uploader.upload(
+                    file,
+                    folder="certificates"
+                )
+                image_url = upload_result["secure_url"]
 
-        conn.commit()
-        conn.close()
+            except Exception as e:
+                print("Upload Error:", e)
+                flash("Image upload failed", "error")
+                return redirect(url_for("edit_certificate", id=id))
+
+        try:
+            c.execute("""
+                UPDATE certificates 
+                SET title=%s, issuer=%s, image=%s 
+                WHERE id=%s
+            """, (title, issuer, image_url, id))
+
+            conn.commit()
+            flash("Certificate updated successfully!", "success")
+
+        except Exception as e:
+            print("DB Error:", e)
+            flash("Failed to update certificate", "error")
+
+        finally:
+            conn.close()
 
         return redirect("/certificates")
 
-    c.execute("SELECT * FROM certificates WHERE id=?", (id,))
-    cert = c.fetchone()
     conn.close()
-
     return render_template("edit_certificate.html", cert=cert)
 
 @app.route("/delete_certificate/<int:id>", methods=["POST"])
 def delete_certificate(id):
     if "user" not in session:
+        flash("Please login first", "error")
         return redirect("/login")
 
-    conn = sqlite3.connect("database.db")
+    conn = get_db_connection()
     c = conn.cursor()
 
-    # 🔹 get image filename
-    c.execute("SELECT image FROM certificates WHERE id=?", (id,))
-    img = c.fetchone()
+    try:
+        # 🔹 Check if certificate exists
+        c.execute("SELECT image FROM certificates WHERE id=%s", (id,))
+        result = c.fetchone()
 
-    # 🔹 delete file from folder
-    if img and img[0]:
-        try:
-            os.remove(os.path.join(UPLOAD_FOLDER, img[0]))
-        except Exception as e:
-            print("File delete error:", e)   # better than silent fail
+        if not result:
+            flash("Certificate not found", "error")
+            return redirect("/certificates")
 
-    # 🔹 delete from DB
-    c.execute("DELETE FROM certificates WHERE id=?", (id,))
-    conn.commit()
-    conn.close()
+        image_url = result[0]
 
-    flash("Certificate deleted successfully!")   # ✅ THIS LINE
+        # 🔹 OPTIONAL: delete from Cloudinary (unchanged)
+
+        # 🔹 Delete from DB
+        c.execute("DELETE FROM certificates WHERE id=%s", (id,))
+        conn.commit()
+
+        flash("Certificate deleted successfully!", "success")
+
+    except Exception as e:
+        print("Delete Error:", e)
+        flash("Failed to delete certificate", "error")
+
+    finally:
+        conn.close()
+
     return redirect("/certificates")
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    print("PROFILE ROUTE HIT")
-
     if "user" not in session:
-        print("NOT LOGGED IN")
+        flash("Please login first", "error")
         return redirect('/login')
 
-    conn = sqlite3.connect('database.db', timeout=5)
+    conn = get_db_connection()
     c = conn.cursor()
+
+    # 🔹 Ensure profile exists
+    c.execute("SELECT * FROM profile WHERE id=%s", (1,))
+    profile_data = c.fetchone()
+
+    if not profile_data:
+        conn.close()
+        flash("Profile not found", "error")
+        return redirect('/')
 
     if request.method == "POST":
         name = request.form.get('name')
@@ -487,46 +558,63 @@ def profile():
         email = request.form.get("email")
         location = request.form.get("location")
         status = request.form.get("status")
-
         file = request.files.get("image")
+        headline = request.form.get("headline")
+        footer_text = request.form.get("footer_text")
+        header_text = request.form.get("header_text")
 
+        # 🔹 Basic validation
+        if not name or not role:
+            flash("Name and Role are required", "error")
+            return redirect('/profile')
+
+        image_url = profile_data[4]  # existing image
+
+        # 🔹 Handle new image upload (UNCHANGED)
         if file and file.filename:
-            filename = str(uuid.uuid4()) + "_" + file.filename
-            file.save(os.path.join("static/uploads", filename))
+            if not file.mimetype.startswith("image/"):
+                flash("Only image files are allowed", "error")
+                return redirect('/profile')
 
+            try:
+                upload_result = cloudinary.uploader.upload(
+                    file,
+                    folder="profile"
+                )
+                image_url = upload_result["secure_url"]
+
+            except Exception as e:
+                print("Upload Error:", e)
+                flash("Image upload failed", "error")
+                return redirect('/profile')
+
+        try:
             c.execute("""
-            UPDATE profile
-            SET name=?, role=?, bio=?, skills=?, linkedin=?, github=?, instagram=?, email=?, location=?, status=?, image=?
-            WHERE id=1
+                UPDATE profile
+                SET name=%s, role=%s, bio=%s, skills=%s, linkedin=%s, github=%s,
+                    instagram=%s, email=%s, location=%s, status=%s,
+                    headline=%s, footer_text=%s, header_text=%s, image=%s
+                WHERE id=%s
             """, (
-    name, role, bio, skills, linkedin, github, instagram,
-    email, location, status, filename
-            ))
-        else:
-           c.execute("""
-            UPDATE profile
-            SET name=?, role=?, bio=?, skills=?, linkedin=?, github=?, instagram=?, email=?, location=?, status=?
-            WHERE id=1
-                """, (
-    name, role, bio, skills, linkedin, github, instagram,
-    email, location, status
+                name, role, bio, skills, linkedin, github, instagram,
+                email, location, status, headline, footer_text, header_text,
+                image_url, 1
             ))
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+            flash("Profile updated successfully!", "success")
 
-        flash("Profile updated successfully ✅")
+        except Exception as e:
+            print("DB Error:", e)
+            flash("Failed to update profile", "error")
+
+        finally:
+            conn.close()
+
         return redirect('/profile')
 
-    # GET request
-    c.execute("SELECT * FROM profile WHERE id=1")
-    profile = c.fetchone()
     conn.close()
-
-    print("RETURNING TEMPLATE")
-    return render_template('profile.html', profile=profile)
-
-from flask import request, redirect, flash
+    return render_template('profile.html', profile=profile_data)
 
 @app.route("/contact", methods=["POST"])
 def contact():
@@ -556,42 +644,64 @@ def contact():
         print(e)
         flash("Failed to send message!", "error")
 
-    return redirect(url_for('home'))   # go back to home
+    return redirect(url_for('home'))
 
 @app.route("/upload_resume", methods=["GET", "POST"])
 def upload_resume():
     if "user" not in session:
+        flash("Please login first", "error")
         return redirect("/login")
 
-    conn = sqlite3.connect("database.db")
+    conn = get_db_connection()
     c = conn.cursor()
 
     if request.method == "POST":
         file = request.files.get("resume")
 
-        if file and file.filename.endswith(".pdf"):
-            original_name = file.filename.strip()
-
-            # 🔹 keep fixed filename (your current logic)
-            filename = "resume.pdf"
-
-            filepath = os.path.join("static/uploads", filename)
-            file.save(filepath)
-
-            # 🔹 store original name for display
-            c.execute("UPDATE resume SET filename=? WHERE id=1", (original_name,))
-            conn.commit()
-
-            # 🟢 success message (with category)
-            flash("Resume uploaded successfully!", "success")
-
+        # 🔹 Check file exists
+        if not file or file.filename.strip() == "":
+            flash("Please select a file", "error")
+            conn.close()
             return redirect(url_for('upload_resume'))
 
-        else:
-            flash("Only PDF files are allowed!", "error")
+        # 🔹 Validate extension
+        if not file.filename.lower().endswith(".pdf"):
+            flash("Only PDF files are allowed", "error")
+            conn.close()
+            return redirect(url_for('upload_resume'))
+
+        try:
+            original_name = file.filename.strip()
+
+            # 🔥 Cloudinary upload (UNCHANGED)
+            upload_result = cloudinary.uploader.upload(
+                file,
+                resource_type="raw",
+                folder="resume"
+            )
+
+            file_url = upload_result["secure_url"]
+
+            # ✅ PostgreSQL UPDATE
+            c.execute(
+                "UPDATE resume SET filename=%s, original_name=%s WHERE id=%s",
+                (file_url, original_name, 1)
+            )
+            conn.commit()
+
+            flash("Resume uploaded successfully!", "success")
+
+        except Exception as e:
+            print("Upload Error:", e)
+            flash("Failed to upload resume", "error")
+
+        finally:
+            conn.close()
+
+        return redirect(url_for('upload_resume'))
 
     # 🔹 GET current resume
-    c.execute("SELECT filename FROM resume WHERE id=1")
+    c.execute("SELECT original_name FROM resume WHERE id=%s", (1,))
     result = c.fetchone()
     current_resume = result[0] if result and result[0] else None
 
@@ -599,21 +709,61 @@ def upload_resume():
 
     return render_template("upload_resume.html", current_resume=current_resume)
 
+
 @app.route('/download-resume')
 def download_resume():
-    filepath = os.path.join("static/uploads", "resume.pdf")
+    conn = get_db_connection()
+    c = conn.cursor()
 
-    if not os.path.exists(filepath):
+    # 🔥 get BOTH url + original name
+    c.execute("SELECT filename, original_name FROM resume WHERE id=%s", (1,))
+    result = c.fetchone()
+    conn.close()
+
+    if not result or not result[0]:
         return "Resume not uploaded yet", 404
 
-    return send_file(
-        filepath,
-        as_attachment=True
-    )
+    file_url = result[0]
+    original_name = result[1] or "resume.pdf"
 
+    try:
+        # 🔥 fetch file (UNCHANGED)
+        response = requests.get(file_url)
+        response.raise_for_status()
 
+        # 🔥 send file with correct name
+        return send_file(
+            BytesIO(response.content),
+            as_attachment=True,
+            download_name=original_name,
+            mimetype="application/pdf"
+        )
 
+    except Exception as e:
+        print("Download error:", e)
+        return "Failed to download resume", 500
+    
+@app.route("/delete_education/<int:id>", methods=["POST"])
+def delete_education(id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+
+        c.execute("DELETE FROM education WHERE id=%s", (id,))
+        conn.commit()
+
+        flash("Education deleted successfully!", "danger")
+
+    except Exception as e:
+        print("Delete Error:", e)
+        flash("Failed to delete education", "error")
+
+    finally:
+        conn.close()
+
+    return redirect(url_for("add_education"))
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
-   

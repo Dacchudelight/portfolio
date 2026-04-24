@@ -246,3 +246,12 @@ body {
         transform: translateY(-10px);
     }
 }
+.project-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-content {
+    max-width: 70%;
+}

@@ -11,18 +11,18 @@
 
 <div class="form-container">
 
-    <!-- 🔹 Back Button -->
     <!-- 🔹 TOP RIGHT NAV -->
-<div class="top-bar">
-    <div class="nav-buttons">
-        <a href="/" class="btn home-btn">🏠 Home</a>
-        <a href="/admin" class="btn back-btn">⬅ Back</a>
+    <div class="top-bar">
+        <div class="nav-buttons">
+            <a href="/" class="btn home-btn">🏠 Home</a>
+            <a href="/admin" class="btn back-btn">⬅ Back</a>
+        </div>
     </div>
-</div>
 
     <h2>Add Project</h2>
 
-    <form method="POST" class="form">
+    <form method="POST" action="{{ url_for('add_project') }}" class="form">
+
         <input name="title" placeholder="Project Title" required>
 
         <textarea name="description" placeholder="Project Description" rows="4" required></textarea>
@@ -32,8 +32,10 @@
         <input name="link" placeholder="GitHub / Live Link" required>
 
         <button type="submit" class="btn primary">Add Project</button>
+
     </form>
 
 </div>
+
 </body>
 </html>

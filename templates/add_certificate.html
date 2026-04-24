@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/add_certificate.css') }}">
 </head>
+
 <body>
 
 <header class="navbar">
@@ -22,7 +23,7 @@
     <div class="form-card">
         <h3>Add New Certificate</h3>
 
-        <form id="certForm" method="POST" enctype="multipart/form-data">
+        <form id="certForm" method="POST" action="/add_certificate" enctype="multipart/form-data">
 
             <label>Certificate Title</label>
             <input type="text" name="title" required>
@@ -33,9 +34,12 @@
             <label>Upload Certificate Image</label>
             <input type="file" name="image" accept="image/*" required onchange="previewImage(event)">
 
+            <!-- Preview -->
             <img id="preview" class="preview-img" style="display:none;">
 
-            <button type="submit" class="btn primary">➕ Add Certificate</button>
+            <button type="submit" class="btn primary" id="submitBtn">
+                ➕ Add Certificate
+            </button>
 
         </form>
     </div>
@@ -44,34 +48,54 @@
 <script>
 function previewImage(event) {
     const img = document.getElementById('preview');
-    img.src = URL.createObjectURL(event.target.files[0]);
-    img.style.display = 'block';
+    const file = event.target.files[0];
+
+    if (file) {
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("certForm");
+    const btn = document.getElementById("submitBtn");
 
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
+        const formData = new FormData(form);
+
+        // 🔥 LOADING STATE
+        btn.classList.add("loading");
+        btn.innerHTML = "Uploading... <span class='spinner'></span>";
+
         fetch("/add_certificate", {
             method: "POST",
-            body: new FormData(form)
+            body: formData
         })
         .then(res => {
             if (res.ok) {
-                showToast("Certificate added successfully!");
+                showToast("Certificate added successfully!", "success");
 
                 form.reset();
+                document.getElementById('preview').style.display = "none";
 
-                const img = document.getElementById('preview');
-                img.style.display = "none";
+                if (res.redirected) {
+                    setTimeout(() => {
+                        window.location.href = res.url;
+                    }, 1200);
+                }
             } else {
                 showToast("Upload failed!", "error");
             }
         })
         .catch(() => {
             showToast("Server error!", "error");
+        })
+        .finally(() => {
+            // 🔥 REMOVE LOADING STATE
+            btn.classList.remove("loading");
+            btn.innerHTML = "➕ Add Certificate";
         });
     });
 });
@@ -83,7 +107,10 @@ function showToast(message, type = "success") {
 
     document.body.appendChild(toast);
 
-    setTimeout(() => toast.remove(), 3000);
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
 }
 </script>
 

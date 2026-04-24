@@ -9,8 +9,8 @@
 <!-- 🔹 TOP BAR -->
 <div class="top-bar">
     <div class="nav-left">
-        <a href="/" class="btn home-btn">🏠 Home</a>
-        <a href="/admin" class="btn back-btn">⬅ Back</a>
+        <a href="{{ url_for('home') }}" class="btn home-btn">🏠 Home</a>
+        <a href="{{ url_for('admin') }}" class="btn back-btn">⬅ Back</a>
     </div>
 </div>
 
@@ -19,24 +19,30 @@
     <!-- 🔹 LEFT: PROFILE PREVIEW -->
     <div class="profile-preview">
 
-        <!-- 🔹 PROFILE IMAGE -->
-        {% if profile and profile|length > 4 and profile[4] %}
-            <img src="{{ url_for('static', filename='uploads/' + profile[4]) }}" class="profile-pic">
+        <!-- PROFILE IMAGE -->
+        {% if profile and profile|length > 4 and profile[4] and profile[4].startswith('http') %}
+            <img src="{{ profile[4] }}" class="profile-pic">
         {% else %}
             <img src="{{ url_for('static', filename='default.png') }}" class="profile-pic">
         {% endif %}
 
         <h2>{{ profile[1] if profile and profile|length > 1 else "Your Name" }}</h2>
         <h4>{{ profile[2] if profile and profile|length > 2 else "Your Role" }}</h4>
+
+        <!-- 🔥 HEADLINE PREVIEW -->
+        <p class="headline-preview">
+            {{ profile[12] if profile and profile|length > 12 and profile[12] else "Your headline..." }}
+        </p>
+
         <p>{{ profile[3] if profile and profile|length > 3 else "Your bio..." }}</p>
 
-        <!-- 🔹 SKILLS -->
+        <!-- SKILLS -->
         <div class="skills">
             <h4>Skills</h4>
             <p>{{ profile[5] if profile and profile|length > 5 and profile[5] else "Add your skills..." }}</p>
         </div>
 
-        <!-- 🔹 LINKS -->
+        <!-- LINKS -->
         <div class="links">
             <h4>Links</h4>
 
@@ -57,7 +63,6 @@
             {% else %}
                 <span>Instagram (not added)</span>
             {% endif %}
-
         </div>
 
     </div>
@@ -67,7 +72,7 @@
 
         <h2>Edit Profile</h2>
 
-        <!-- 🔹 TOAST -->
+        <!-- TOAST -->
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <div id="toast" class="toast show">
@@ -76,7 +81,7 @@
           {% endif %}
         {% endwith %}
 
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
 
             <label>Name</label>
             <input name="name" value="{{ profile[1] if profile and profile|length > 1 else '' }}" required>
@@ -88,7 +93,7 @@
             <textarea name="bio" required>{{ profile[3] if profile and profile|length > 3 else '' }}</textarea>
 
             <label>Profile Image</label>
-            <input type="file" name="image" id="imageInput">
+            <input type="file" name="image">
 
             <label>Skills</label>
             <input name="skills" value="{{ profile[5] if profile and profile|length > 5 else '' }}" placeholder="Python, SQL, ML">
@@ -98,27 +103,44 @@
 
             <label>GitHub</label>
             <input name="github" value="{{ profile[7] if profile and profile|length > 7 else '' }}" placeholder="https://github.com/...">
-            
-            <label>Email</label>
-            <input name="email"
-                    value="{{ profile[9] if profile|length > 9 else '' }}"
-                    placeholder="yourmail@gmail.com">
 
-            <label>Location</label>
-            <input name="location"
-                     value="{{ profile[10] if profile|length > 10 else '' }}"
-                     placeholder="India">
+            <label>Instagram</label>
+            <input name="instagram" value="{{ profile[8] if profile and profile|length > 8 else '' }}" placeholder="https://instagram.com/...">
 
+            <!-- 🔥 CONTACT -->
+           <!-- 🔥 CONTACT -->
+<label>Email</label>
+<input name="email"
+       value="{{ profile[9] if profile and profile|length > 9 else '' }}"
+       placeholder="yourmail@gmail.com">
+
+<label>Location</label>
+<input name="location"
+       value="{{ profile[10] if profile and profile|length > 10 else '' }}"
+       placeholder="India">
+
+<!-- ✅ 1. STATUS -->
 <label>Status</label>
 <input name="status"
-       value="{{ profile[11] if profile|length > 11 else '' }}"
+       value="{{ profile[11] if profile and profile|length > 11 else '' }}"
        placeholder="Actively seeking Data Analyst roles">
 
-            <!-- 🔥 NEW: INSTAGRAM -->
-            <label>Instagram</label>
-            <input name="instagram"
-                   value="{{ profile[8] if profile and profile|length > 8 else '' }}"
-                   placeholder="https://instagram.com/...">
+<!-- ✅ 2. HEADLINE -->
+<label>Headline</label>
+<input name="headline"
+       value="{{ profile[12] if profile and profile|length > 12 else '' }}"
+       placeholder="Data Analyst | Python • SQL • Power BI">
+
+<!-- ✅ 3. FOOTER -->
+<label>Footer Text</label>
+<input name="footer_text"
+       value="{{ profile[13] if profile and profile|length > 13 else '' }}"
+       placeholder="© 2026 Your Name | Role">
+       
+<label>Header Text</label>
+<input name="header_text"
+       value="{{ profile[14] if profile and profile|length > 14 else '' }}"
+       placeholder="Darshan R • Data Analyst">
 
             <button type="submit">Update Profile</button>
 
@@ -128,7 +150,6 @@
 
 </div>
 
-<!-- 🔹 JS -->
 <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 
 </body>

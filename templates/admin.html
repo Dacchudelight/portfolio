@@ -10,31 +10,35 @@
 <body>
 
 <!-- 🔹 TOAST MESSAGE -->
-<!-- 🔹 TOAST MESSAGE -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    {% for category, msg in messages %}
-      <div class="toast {{ category }}">{{ msg }}</div>
-    {% endfor %}
+    <div class="toast-container">
+      {% for category, msg in messages %}
+        <div class="toast {{ category }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
   {% endif %}
 {% endwith %}
+
 <!-- 🔹 NAVBAR -->
 <header class="navbar">
     <h2>⚙️ Admin Dashboard</h2>
 
     <div class="nav-buttons">
         <a href="/" class="btn">🏠 Home</a>
-        <a href="/add_project" class="btn primary">+ Add Project</a>
-        <a href="/certificates" class="btn secondary">🎓 Certificates</a>
-        <a href="/profile" class="btn secondary">👤 Profile</a>
-        <a href="/upload_resume" class="nav-btn upload">📄 Upload Resume</a>
-        <a href="/logout" class="btn danger">Logout</a>
+        <a href="{{ url_for('add_project') }}" class="btn primary">+ Add Project</a>
+        <a href="{{ url_for('add_education') }}" class="btn primary">🎓 Add Education</a>
+        <a href="{{ url_for('certificates_page') }}" class="btn secondary">🎓 Certificates</a>
+        <a href="{{ url_for('profile') }}" class="btn secondary">👤 Profile</a>
+        <a href="{{ url_for('upload_resume') }}" class="nav-btn upload">📄 Upload Resume</a>
+        <a href="{{ url_for('logout') }}" class="btn danger">Logout</a>
     </div>
 </header>
 
 <!-- 🔹 MAIN CONTENT -->
 <main class="container">
 
+    <!-- 🔹 PROJECTS -->
     <div class="header-section">
         <h3>Your Projects</h3>
         <p>Manage, edit or remove your portfolio projects</p>
@@ -46,18 +50,24 @@
 
             <div class="project-content">
                 <h4>{{ p[1] }}</h4>
-                <p>{{ p[3] }}</p>
+                <p>{{ p[2] }}</p>
             </div>
 
             <div class="project-actions">
-                <a href="/edit_project/{{ p[0] }}" class="btn edit">✏️ Edit</a>
 
-                <form action="/delete_project/{{ p[0] }}" method="POST" style="display:inline;">
+                <!-- EDIT -->
+                <a href="{{ url_for('edit_project', id=p[0]) }}" class="btn edit">
+                    ✏️ Edit
+                </a>
+
+                <!-- DELETE -->
+                <form action="{{ url_for('delete_project', id=p[0]) }}" method="POST">
                     <button type="submit" class="btn danger"
                         onclick="return confirm('Delete this project?');">
                         🗑 Delete
                     </button>
                 </form>
+
             </div>
 
         </div>
@@ -67,6 +77,16 @@
     </div>
 
 </main>
+
+<!-- 🔥 AUTO HIDE TOAST -->
+<script>
+setTimeout(() => {
+    document.querySelectorAll('.toast').forEach(el => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+    });
+}, 2500);
+</script>
 
 </body>
 </html>
