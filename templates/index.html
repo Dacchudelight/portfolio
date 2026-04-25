@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>
-    {{ profile[1] if profile else "Your Name" }} | 
-    {{ profile[2] if profile else "Your Role" }}
-</title>
+    
+    <title>
+        {{ profile[1] if profile and profile[1] else "Your Name" }} | 
+        {{ profile[2] if profile and profile[2] else "Your Role" }}
+    </title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
@@ -26,13 +27,12 @@
         </div>
     {% endif %}
 {% endwith %}
-
 <!-- 🔹 NAVBAR -->
 <nav class="navbar">
     <h2 class="logo">
-    {{ profile[14] if profile and profile|length > 14 and profile[14] 
-       else ((profile[1] ~ " • " ~ profile[2]) if profile else "Your Name • Your Role") }}
-</h2>
+        {{ (profile[1] ~ " • " ~ profile[2]) if profile else "Your Name • Your Role" }}
+    </h2>
+
     <div class="nav-links">
         <a href="#" onclick="goHome(event)">Home</a>
         <a href="#" id="eduLink">Education</a>
@@ -50,11 +50,19 @@
 <div class="hero-text">
     {% if profile %}
         <h1>{{ profile[1] if profile and profile[1] else "Your Name" }}</h1>
+
         <p class="aspiring-text">
-    {{ profile[12] if profile and profile|length > 12 and profile[12] else "Data Analyst | Python • SQL • Power BI" }}
-</p>
-        <p class="role highlight-role">{{ profile[2] }}</p>
-        <p class="bio">{{ profile[3] if profile and profile[3] else "Your bio..." }}</p>
+            {{ profile[12] if profile and profile|length > 12 and profile[12] else "Data Analyst | Python • SQL • Power BI" }}
+        </p>
+
+        <p class="role highlight-role">
+            {{ profile[2] if profile and profile[2] else "" }}
+        </p>
+
+        <p class="bio">
+            {{ profile[3] if profile and profile[3] else "Your bio..." }}
+        </p>
+
     {% else %}
         <h1>Your Name</h1>
         <p>Your Role</p>
@@ -69,8 +77,6 @@
         <button id="btn-certificates" class="btn btn-main" onclick="showCertificates(event)">
             View Certificates
         </button>
-        
-
     </div>
 
     <div class="social-links">
@@ -97,15 +103,14 @@
 </div>
 
 <div class="hero-image">
-    {% if profile and profile|length > 4 and profile[4] and profile[4].startswith('http') %}
-        <img src="{{ profile[4] }}" alt="Profile Image">
+    {% if profile and profile|length > 14 and profile[14] and profile[14].startswith('http') %}
+        <img src="{{ profile[14] }}" alt="Profile Image">
     {% else %}
         <img src="{{ url_for('static', filename='default.png') }}" alt="Default Image">
     {% endif %}
 </div>
 
 </section>
-
 <!-- 🔹 SKILLS -->
 <section class="skills-section">
     <h2>Skills</h2>
@@ -113,7 +118,7 @@
     {% if profile and profile|length > 5 and profile[5] %}
         <div class="skills-container">
 
-            {% set raw_skills = profile[5]
+            {% set raw_skills = (profile[5] or "")
                 .replace('\n', ',')
                 .replace('•', ',')
                 .replace('-', ',')
@@ -137,47 +142,59 @@
     <h2 class="section-title">🎓 Education</h2>
 
     <div class="education-container">
-        {% for edu in education %}
-        <div class="education-box">
-            <div class="edu-left">
-                <h3>{{ edu[1] }}</h3>
-                <p class="edu-institution">{{ edu[2] }}</p>
+        {% if education and education|length > 0 %}
+            {% for edu in education %}
+            <div class="education-box">
+                <div class="edu-left">
+                    <h3>{{ edu[1] if edu[1] else "" }}</h3>
+                    <p class="edu-institution">{{ edu[2] if edu[2] else "" }}</p>
 
-                {% if edu[4] %}
-                <p class="edu-desc">{{ edu[4] }}</p>
-                {% endif %}
-            </div>
+                    {% if edu[4] %}
+                        <p class="edu-desc">{{ edu[4] }}</p>
+                    {% endif %}
+                </div>
 
-            <div class="edu-right">
-                <span class="edu-year">{{ edu[3] }}</span>
+                <div class="edu-right">
+                    <span class="edu-year">{{ edu[3] if edu[3] else "" }}</span>
+                </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p class="empty">No education details added.</p>
+        {% endif %}
     </div>
 
 </section>
+
 
 <!-- 🔹 PROJECTS -->
 <section id="projects-section" class="projects hidden-section">
     <h2>📊Projects</h2>
 
     <div class="grid">
-        {% for p in projects %}
-        <div class="card">
-            <h3>{{ p[1] }}</h3>
-            <p>{{ p[2] }}</p>
+        {% if projects and projects|length > 0 %}
+            {% for p in projects %}
+            <div class="card">
+                <h3>{{ p[1] if p[1] else "" }}</h3>
+                <p>{{ p[2] if p[2] else "" }}</p>
 
-            <div class="tags">
-                <span>{{ p[3] }}</span>
+                {% if p[3] %}
+                <div class="tags">
+                    <span>{{ p[3] }}</span>
+                </div>
+                {% endif %}
+
+                {% if p[4] %}
+                    <a href="{{ p[4] }}" target="_blank" class="link-btn">View Project →</a>
+                {% endif %}
             </div>
-
-            {% if p[4] %}
-                <a href="{{ p[4] }}" target="_blank" class="link-btn">View Project →</a>
-            {% endif %}
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p class="empty">No projects available.</p>
+        {% endif %}
     </div>
 </section>
+
 
 <!-- 🔹 CERTIFICATES -->
 <section id="certificates-section" class="projects hidden-section">
@@ -197,8 +214,8 @@
                     <div class="no-image">No Image</div>
                 {% endif %}
 
-                <h4>{{ c[1] }}</h4>
-                <p>{{ c[2] }}</p>
+                <h4>{{ c[1] if c[1] else "" }}</h4>
+                <p>{{ c[2] if c[2] else "" }}</p>
 
             </div>
             {% endfor %}
@@ -221,8 +238,9 @@
                 <i class="fas fa-envelope"></i>
                 <div>
                     <span>Email</span>
-                    <a href="mailto:{{ profile[9] if profile and profile|length > 9 else '' }}">
-                        {{ profile[9] if profile and profile|length > 9 else 'Not available' }}
+                    {% set email = profile[9] if profile and profile|length > 9 and profile[9] else "" %}
+                    <a href="mailto:{{ email }}">
+                        {{ email if email else "Not available" }}
                     </a>
                 </div>
             </div>
@@ -231,7 +249,7 @@
                 <i class="fas fa-location-dot"></i>
                 <div>
                     <span>Location</span>
-                    <p>{{ profile[10] if profile and profile|length > 10 else 'Not available' }}</p>
+                    <p>{{ profile[10] if profile and profile|length > 10 and profile[10] else "Not available" }}</p>
                 </div>
             </div>
 
@@ -239,7 +257,7 @@
                 <i class="fas fa-briefcase"></i>
                 <div>
                     <span>Status</span>
-                    <p>{{ profile[11] if profile and profile|length > 11 else 'Not available' }}</p>
+                    <p>{{ profile[11] if profile and profile|length > 11 and profile[11] else "Not available" }}</p>
                 </div>
             </div>
 

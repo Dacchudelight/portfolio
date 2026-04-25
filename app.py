@@ -61,9 +61,8 @@ cloudinary.config(
 def home():
     conn = get_db_connection()
 
-    # 🚨 Handle DB failure
     if not conn:
-        print("DB connection failed in home()")
+        print("❌ DB connection failed in home()")
         return render_template(
             "index.html",
             projects=[],
@@ -75,32 +74,27 @@ def home():
     try:
         c = conn.cursor()
 
-        # Fetch projects
         c.execute("SELECT * FROM projects ORDER BY id DESC")
         projects = c.fetchall()
 
-        # Fetch certificates
         c.execute("SELECT * FROM certificates ORDER BY id DESC")
         certificates = c.fetchall()
 
-        # Fetch profile
         c.execute("SELECT * FROM profile WHERE id=%s", (1,))
         profile = c.fetchone()
 
-        # Fetch education
         c.execute("SELECT * FROM education ORDER BY id DESC")
         education = c.fetchall()
 
-    except Exception as e:
-        print("HOME ERROR:", e)
+        print("✅ EDUCATION DATA:", education)
 
-        projects = []
-        certificates = []
-        profile = None
-        education = []
+    except Exception as e:
+        print("❌ HOME ERROR:", e)
+        projects, certificates, profile, education = [], [], None, []
 
     finally:
-        conn.close()
+        if conn:
+            conn.close()
 
     return render_template(
         "index.html",
