@@ -1,10 +1,10 @@
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, session, url_for, flash, send_file
 from flask_mail import Mail, Message
 import os
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-from dotenv import load_dotenv
 import requests
 from io import BytesIO
 import psycopg2
@@ -81,41 +81,62 @@ def home():
         education=education
     )
 
+from werkzeug.security import check_password_hash
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         user = request.form.get("username")
         pwd = request.form.get("password")
 
-        # 🔹 Basic validation
         if not user or not pwd:
             flash("Username and password are required", "error")
             return redirect("/login")
+
+        conn = None
 
         try:
             conn = get_db_connection()
             c = conn.cursor()
 
-            c.execute(
-                "SELECT * FROM users WHERE username=%s AND password=%s",
-                (user, pwd)
-            )
+            # ✅ Fetch only by username
+            c.execute("SELECT * FROM users WHERE username=%s", (user,))
             result = c.fetchone()
 
+            # 🔥 DEBUG START
+            print("DB result:", result)
+            print("Entered username:", user)
+            print("Entered password:", pwd)
+            # 🔥 DEBUG END
+
+            if result:
+                stored_password = result[2]
+
+                # 🔥 DEBUG HASH
+                print("Stored hash:", stored_password)
+
+                match = check_password_hash(stored_password, pwd)
+                print("Password match:", match)
+
+                if match:
+                    session["user"] = user
+                    flash("Login successful", "success")
+                    return redirect("/admin")
+                else:
+                    flash("Invalid username or password", "error")
+            else:
+                flash("Invalid username or password", "error")
+
         except Exception as e:
-            print("DB Error:", e)
-            flash("Something went wrong. Try again.", "error")
+            import traceback
+            traceback.print_exc()
+            print("LOGIN ERROR:", e)
+            flash("Server error. Check logs.", "error")
             return redirect("/login")
 
         finally:
-            conn.close()
-
-        if result:
-            session["user"] = user
-            flash("Login successful", "success")
-            return redirect("/admin")
-        else:
-            flash("Invalid username or password", "error")
+            if conn:
+                conn.close()
 
     return render_template("login.html")
 
