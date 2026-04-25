@@ -12,9 +12,16 @@ import psycopg2
 from werkzeug.security import generate_password_hash, check_password_hash
 def get_db_connection():
     try:
+        db_url = os.environ.get("DATABASE_URL")
+        if not db_url:
+            print("DB CONNECTION ERROR: DATABASE_URL is not set!")
+            return None
+        # Log sanitized URL for debugging (hide password)
+        safe_url = db_url.split("@")[-1] if "@" in db_url else "unknown"
+        print(f"[DB] Connecting to: ...@{safe_url}")
         return psycopg2.connect(
-            os.environ.get("DATABASE_URL"),
-            sslmode="require"
+            db_url,
+            connect_timeout=10
         )
     except Exception as e:
         print("DB CONNECTION ERROR:", e)
