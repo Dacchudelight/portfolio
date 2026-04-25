@@ -1,32 +1,39 @@
 from dotenv import load_dotenv
+load_dotenv()  # ✅ FIRST
+
+import os
 from flask import Flask, render_template, request, redirect, session, url_for, flash, send_file
 from flask_mail import Mail, Message
-import os
 import cloudinary
 import cloudinary.uploader
-import cloudinary.api
 import requests
 from io import BytesIO
 import psycopg2
-import os
 from werkzeug.security import generate_password_hash, check_password_hash
-
-print(os.environ.get("DATABASE_URL"))
-
-# ✅ PostgreSQL connection
 def get_db_connection():
-    return psycopg2.connect(
-        os.environ.get("DATABASE_URL"),
-        sslmode="require"
-    )
+    try:
+        return psycopg2.connect(
+            os.environ.get("DATABASE_URL"),
+            sslmode="require"
+        )
+    except Exception as e:
+        print("DB CONNECTION ERROR:", e)
+        return None
+
+def safe_db_connection():
+    conn = get_db_connection()
+    if not conn:
+        print("DB connection failed")
+        return None, None
+    return conn, conn.cursor()
+
 def is_logged_in():
     return "user" in session
 
-# Load environment variables
-load_dotenv()
-
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
+
+# ✅ FIXED SECRET KEY
+app.secret_key = os.getenv("SECRET_KEY") or "fallback_secret_123"
 
 @app.after_request
 def add_header(response):
@@ -53,25 +60,47 @@ cloudinary.config(
 @app.route("/")
 def home():
     conn = get_db_connection()
-    c = conn.cursor()
 
-    # Fetch projects
-    c.execute("SELECT * FROM projects ORDER BY id DESC")
-    projects = c.fetchall()
+    # 🚨 Handle DB failure
+    if not conn:
+        print("DB connection failed in home()")
+        return render_template(
+            "index.html",
+            projects=[],
+            certificates=[],
+            profile=None,
+            education=[]
+        )
 
-    # Fetch certificates
-    c.execute("SELECT * FROM certificates ORDER BY id DESC")
-    certificates = c.fetchall()
+    try:
+        c = conn.cursor()
 
-    # Fetch profile
-    c.execute("SELECT * FROM profile WHERE id=%s", (1,))
-    profile = c.fetchone()
+        # Fetch projects
+        c.execute("SELECT * FROM projects ORDER BY id DESC")
+        projects = c.fetchall()
 
-    # Fetch education
-    c.execute("SELECT * FROM education ORDER BY id DESC")
-    education = c.fetchall()
+        # Fetch certificates
+        c.execute("SELECT * FROM certificates ORDER BY id DESC")
+        certificates = c.fetchall()
 
-    conn.close()
+        # Fetch profile
+        c.execute("SELECT * FROM profile WHERE id=%s", (1,))
+        profile = c.fetchone()
+
+        # Fetch education
+        c.execute("SELECT * FROM education ORDER BY id DESC")
+        education = c.fetchall()
+
+    except Exception as e:
+        print("HOME ERROR:", e)
+
+        projects = []
+        certificates = []
+        profile = None
+        education = []
+
+    finally:
+        conn.close()
 
     return render_template(
         "index.html",
@@ -81,14 +110,13 @@ def home():
         education=education
     )
 
-from werkzeug.security import check_password_hash
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         user = request.form.get("username")
         pwd = request.form.get("password")
 
+        # 🔹 Basic validation
         if not user or not pwd:
             flash("Username and password are required", "error")
             return redirect("/login")
@@ -97,25 +125,34 @@ def login():
 
         try:
             conn = get_db_connection()
+
+            # 🚨 Handle DB failure
+            if not conn:
+                print("DB connection failed in login")
+                flash("Database connection failed", "error")
+                return redirect("/login")
+
             c = conn.cursor()
 
-            # ✅ Fetch only by username
+            # ✅ Fetch user
             c.execute("SELECT * FROM users WHERE username=%s", (user,))
             result = c.fetchone()
 
-            # 🔥 DEBUG START
             print("DB result:", result)
-            print("Entered username:", user)
-            print("Entered password:", pwd)
-            # 🔥 DEBUG END
 
             if result:
                 stored_password = result[2]
 
-                # 🔥 DEBUG HASH
                 print("Stored hash:", stored_password)
 
-                match = check_password_hash(stored_password, pwd)
+                # ✅ Safe password check
+                try:
+                    match = check_password_hash(stored_password, pwd)
+                except Exception as hash_error:
+                    print("HASH ERROR:", hash_error)
+                    flash("Password verification failed", "error")
+                    return redirect("/login")
+
                 print("Password match:", match)
 
                 if match:
@@ -146,17 +183,31 @@ def admin():
         return redirect("/login")
 
     conn = get_db_connection()
-    c = conn.cursor()
 
-    # 🔹 Projects
-    c.execute("SELECT * FROM projects ORDER BY id DESC")
-    projects = c.fetchall()
+    # 🚨 Handle DB failure
+    if not conn:
+        print("DB connection failed in admin()")
+        return "Database connection failed", 500
 
-    # 🔹 Education
-    c.execute("SELECT * FROM education ORDER BY id DESC")
-    education = c.fetchall()
+    try:
+        c = conn.cursor()
 
-    conn.close()
+        # 🔹 Projects
+        c.execute("SELECT * FROM projects ORDER BY id DESC")
+        projects = c.fetchall()
+
+        # 🔹 Education
+        c.execute("SELECT * FROM education ORDER BY id DESC")
+        education = c.fetchall()
+
+    except Exception as e:
+        print("ADMIN ERROR:", e)
+
+        projects = []
+        education = []
+
+    finally:
+        conn.close()
 
     return render_template(
         "admin.html",
