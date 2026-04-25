@@ -37,8 +37,8 @@
     <!-- 🔥 CURRENT RESUME STATUS -->
     {% if current_resume %}
         <div class="current-file">
-             Current Resume:
-             <a href="{{ current_resume }}" target="_blank">
+             Current Resume: <strong>{{ current_resume }}</strong>
+             <a href="{{ url_for('download_resume') }}" target="_blank">
                  View Resume
              </a>
         </div>

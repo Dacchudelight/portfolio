@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-load_dotenv()  # ✅ FIRST
+load_dotenv()  # [OK] FIRST
 
 import os
 from flask import Flask, render_template, request, redirect, session, url_for, flash, send_file
@@ -32,7 +32,7 @@ def is_logged_in():
 
 app = Flask(__name__)
 
-# ✅ FIXED SECRET KEY
+# [OK] FIXED SECRET KEY
 app.secret_key = os.getenv("SECRET_KEY") or "fallback_secret_123"
 
 @app.after_request
@@ -40,7 +40,7 @@ def add_header(response):
     response.cache_control.no_store = True
     return response
 
-# 🔹 MAIL CONFIG
+#  MAIL CONFIG
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -49,7 +49,7 @@ app.config['MAIL_PASSWORD'] = os.environ.get("MAIL_PASSWORD")
 
 mail = Mail(app)
 
-# 🔹 CLOUDINARY CONFIG
+#  CLOUDINARY CONFIG
 cloudinary.config(
     cloud_name=os.environ.get("CLOUD_NAME"),
     api_key=os.environ.get("API_KEY"),
@@ -62,7 +62,7 @@ def home():
     conn = get_db_connection()
 
     if not conn:
-        print("❌ DB connection failed in home()")
+        print("[ERROR] DB connection failed in home()")
         return render_template(
             "index.html",
             projects=[],
@@ -86,10 +86,8 @@ def home():
         c.execute("SELECT * FROM education ORDER BY id DESC")
         education = c.fetchall()
 
-        print("✅ EDUCATION DATA:", education)
-
     except Exception as e:
-        print("❌ HOME ERROR:", e)
+        print("[ERROR] HOME ERROR:", e)
         projects, certificates, profile, education = [], [], None, []
 
     finally:
@@ -110,7 +108,7 @@ def login():
         user = request.form.get("username")
         pwd = request.form.get("password")
 
-        # 🔹 Basic validation
+        #  Basic validation
         if not user or not pwd:
             flash("Username and password are required", "error")
             return redirect("/login")
@@ -120,7 +118,7 @@ def login():
         try:
             conn = get_db_connection()
 
-            # 🚨 Handle DB failure
+            # [!] Handle DB failure
             if not conn:
                 print("DB connection failed in login")
                 flash("Database connection failed", "error")
@@ -128,7 +126,7 @@ def login():
 
             c = conn.cursor()
 
-            # ✅ Fetch user
+            # [OK] Fetch user
             c.execute("SELECT * FROM users WHERE username=%s", (user,))
             result = c.fetchone()
 
@@ -139,7 +137,7 @@ def login():
 
                 print("Stored hash:", stored_password)
 
-                # ✅ Safe password check
+                # [OK] Safe password check
                 try:
                     match = check_password_hash(stored_password, pwd)
                 except Exception as hash_error:
@@ -178,7 +176,7 @@ def admin():
 
     conn = get_db_connection()
 
-    # 🚨 Handle DB failure
+    # [!] Handle DB failure
     if not conn:
         print("DB connection failed in admin()")
         return "Database connection failed", 500
@@ -186,11 +184,11 @@ def admin():
     try:
         c = conn.cursor()
 
-        # 🔹 Projects
+        #  Projects
         c.execute("SELECT * FROM projects ORDER BY id DESC")
         projects = c.fetchall()
 
-        # 🔹 Education
+        #  Education
         c.execute("SELECT * FROM education ORDER BY id DESC")
         education = c.fetchall()
 
@@ -212,7 +210,7 @@ def admin():
 
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():
-    # 🔒 Check login
+    #  Check login
     if not is_logged_in():
         return redirect('/login')
 
@@ -223,7 +221,7 @@ def add_project():
             tools = request.form['tools']
             link = request.form['link']
 
-            # 🔹 Basic validation
+            #  Basic validation
             if not title or not description:
                 flash("Title and Description are required!", "error")
                 return redirect('/add_project')
@@ -295,10 +293,10 @@ def add_education():
 
         flash("Education added successfully!", "success")
 
-        # ✅ PRG pattern (keep this)
+        # [OK] PRG pattern (keep this)
         return redirect(url_for("add_education"))
 
-    # ✅ GET request → fetch data
+    # [OK] GET request  fetch data
     c.execute("SELECT * FROM education ORDER BY id DESC")
     education = c.fetchall()
 
@@ -335,7 +333,7 @@ def edit_education(id):
         year = request.form.get("year")
         description = request.form.get("description")
 
-        # 🔍 Basic validation
+        #  Basic validation
         if not degree or not institution or not year:
             flash("All fields except description are required", "error")
             return render_template("edit_education.html", edu=edu)
@@ -444,7 +442,7 @@ def add_certificate():
         issuer = request.form.get("issuer")
         file = request.files.get("image")
 
-        # 🔹 Basic validation
+        #  Basic validation
         if not title or not issuer:
             flash("Title and Issuer are required", "error")
             return redirect("/add_certificate")
@@ -453,20 +451,20 @@ def add_certificate():
             flash("Please upload an image", "error")
             return redirect("/add_certificate")
 
-        # 🔹 File type validation
+        #  File type validation
         if not file.mimetype.startswith("image/"):
             flash("Only image files are allowed", "error")
             return redirect("/add_certificate")
 
         try:
-            # 🔹 Upload to Cloudinary (UNCHANGED)
+            #  Upload to Cloudinary (UNCHANGED)
             upload_result = cloudinary.uploader.upload(
                 file,
                 folder="certificates"
             )
             image_url = upload_result["secure_url"]
 
-            # ✅ PostgreSQL connection
+            # [OK] PostgreSQL connection
             conn = get_db_connection()
             c = conn.cursor()
 
@@ -497,7 +495,7 @@ def edit_certificate(id):
     conn = get_db_connection()
     c = conn.cursor()
 
-    # 🔹 Check if certificate exists
+    #  Check if certificate exists
     c.execute("SELECT * FROM certificates WHERE id=%s", (id,))
     cert = c.fetchone()
 
@@ -511,14 +509,14 @@ def edit_certificate(id):
         issuer = request.form.get("issuer")
         file = request.files.get("image")
 
-        # 🔹 Basic validation
+        #  Basic validation
         if not title or not issuer:
             flash("Title and Issuer are required", "error")
             return redirect(url_for("edit_certificate", id=id))
 
         image_url = cert[3]  # existing image
 
-        # 🔹 If new file uploaded (UNCHANGED)
+        #  If new file uploaded (UNCHANGED)
         if file and file.filename != "":
             if not file.mimetype.startswith("image/"):
                 flash("Only image files are allowed", "error")
@@ -568,7 +566,7 @@ def delete_certificate(id):
     c = conn.cursor()
 
     try:
-        # 🔹 Check if certificate exists
+        #  Check if certificate exists
         c.execute("SELECT image FROM certificates WHERE id=%s", (id,))
         result = c.fetchone()
 
@@ -578,9 +576,9 @@ def delete_certificate(id):
 
         image_url = result[0]
 
-        # 🔹 OPTIONAL: delete from Cloudinary (unchanged)
+        #  OPTIONAL: delete from Cloudinary (unchanged)
 
-        # 🔹 Delete from DB
+        #  Delete from DB
         c.execute("DELETE FROM certificates WHERE id=%s", (id,))
         conn.commit()
 
@@ -604,7 +602,7 @@ def profile():
     conn = get_db_connection()
     c = conn.cursor()
 
-    # 🔹 Ensure profile exists
+    #  Ensure profile exists
     c.execute("SELECT * FROM profile WHERE id=%s", (1,))
     profile_data = c.fetchone()
 
@@ -629,14 +627,14 @@ def profile():
         footer_text = request.form.get("footer_text")
         header_text = request.form.get("header_text")
 
-        # 🔹 Basic validation
+        #  Basic validation
         if not name or not role:
             flash("Name and Role are required", "error")
             return redirect('/profile')
 
         image_url = profile_data[4]  # existing image
 
-        # 🔹 Handle new image upload (UNCHANGED)
+        #  Handle new image upload (UNCHANGED)
         if file and file.filename:
             if not file.mimetype.startswith("image/"):
                 flash("Only image files are allowed", "error")
@@ -724,13 +722,13 @@ def upload_resume():
     if request.method == "POST":
         file = request.files.get("resume")
 
-        # 🔹 Check file exists
+        #  Check file exists
         if not file or file.filename.strip() == "":
             flash("Please select a file", "error")
             conn.close()
             return redirect(url_for('upload_resume'))
 
-        # 🔹 Validate extension
+        #  Validate extension
         if not file.filename.lower().endswith(".pdf"):
             flash("Only PDF files are allowed", "error")
             conn.close()
@@ -739,7 +737,7 @@ def upload_resume():
         try:
             original_name = file.filename.strip()
 
-            # 🔥 Cloudinary upload (UNCHANGED)
+            #  Cloudinary upload (UNCHANGED)
             upload_result = cloudinary.uploader.upload(
                 file,
                 resource_type="raw",
@@ -748,7 +746,7 @@ def upload_resume():
 
             file_url = upload_result["secure_url"]
 
-            # ✅ PostgreSQL UPDATE
+            # [OK] PostgreSQL UPDATE
             c.execute(
                 "UPDATE resume SET filename=%s, original_name=%s WHERE id=%s",
                 (file_url, original_name, 1)
@@ -766,7 +764,7 @@ def upload_resume():
 
         return redirect(url_for('upload_resume'))
 
-    # 🔹 GET current resume
+    #  GET current resume
     c.execute("SELECT original_name FROM resume WHERE id=%s", (1,))
     result = c.fetchone()
     current_resume = result[0] if result and result[0] else None
@@ -781,7 +779,7 @@ def download_resume():
     conn = get_db_connection()
     c = conn.cursor()
 
-    # 🔥 get BOTH url + original name
+    #  get BOTH url + original name
     c.execute("SELECT filename, original_name FROM resume WHERE id=%s", (1,))
     result = c.fetchone()
     conn.close()
@@ -793,11 +791,11 @@ def download_resume():
     original_name = result[1] or "resume.pdf"
 
     try:
-        # 🔥 fetch file (UNCHANGED)
+        #  fetch file (UNCHANGED)
         response = requests.get(file_url)
         response.raise_for_status()
 
-        # 🔥 send file with correct name
+        #  send file with correct name
         return send_file(
             BytesIO(response.content),
             as_attachment=True,

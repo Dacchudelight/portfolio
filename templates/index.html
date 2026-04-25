@@ -32,11 +32,7 @@
 <!-- 🔹 NAVBAR -->
 <nav class="navbar">
     <h2 class="logo">
-        {% if profile and profile|length > 2 %}
-            {{ (profile[1] or "Your Name") ~ " • " ~ (profile[2] or "Your Role") }}
-        {% else %}
-            Your Name • Your Role
-        {% endif %}
+        {{ profile[12] if profile and profile|length > 12 and profile[12] else "Portfolio" }}
     </h2>
 
     <div class="nav-links">
@@ -58,7 +54,7 @@
         <h1>{{ profile[1] if profile and profile[1] else "Your Name" }}</h1>
 
         <p class="aspiring-text">
-            {{ profile[11] if profile and profile|length > 11 and profile[11] else "Data Analyst | Python • SQL • Power BI" }}
+            {{ profile[14] if profile and profile|length > 14 and profile[14] else "Aspiring" }}
         </p>
 
         <p class="role highlight-role">
@@ -87,20 +83,20 @@
 
     <div class="social-links">
 
-        {% if profile and profile|length > 5 and profile[5] %}
-            <a href="{{ profile[5] }}" target="_blank" class="social-icon linkedin">
+        {% if profile and profile|length > 6 and profile[6] %}
+            <a href="{{ profile[6] }}" target="_blank" class="social-icon linkedin">
                 <i class="fab fa-linkedin-in"></i>
             </a>
         {% endif %}
 
-        {% if profile and profile|length > 6 and profile[6] %}
-            <a href="{{ profile[6] }}" target="_blank" class="social-icon github">
+        {% if profile and profile|length > 7 and profile[7] %}
+            <a href="{{ profile[7] }}" target="_blank" class="social-icon github">
                 <i class="fab fa-github"></i>
             </a>
         {% endif %}
 
-        {% if profile and profile|length > 7 and profile[7] %}
-            <a href="{{ profile[7] }}" target="_blank" class="social-icon instagram">
+        {% if profile and profile|length > 8 and profile[8] %}
+            <a href="{{ profile[8] }}" target="_blank" class="social-icon instagram">
                 <i class="fab fa-instagram"></i>
             </a>
         {% endif %}
@@ -109,8 +105,8 @@
 </div>
 
 <div class="hero-image">
-    {% if profile and profile|length > 14 and profile[14] and profile[14].startswith('http') %}
-        <img src="{{ profile[14] }}" alt="Profile Image">
+    {% if profile and profile|length > 4 and profile[4] and profile[4].startswith('http') %}
+        <img src="{{ profile[4] }}" alt="Profile Image">
     {% else %}
         <img src="{{ url_for('static', filename='default.png') }}" alt="Default Image">
     {% endif %}
@@ -122,10 +118,10 @@
 <section class="skills-section">
     <h2>Skills</h2>
 
-    {% if profile and profile|length > 4 and profile[4] %}
+    {% if profile and profile|length > 5 and profile[5] %}
         <div class="skills-container">
 
-            {% set raw_skills = (profile[4] or "")
+            {% set raw_skills = (profile[5] or "")
                 .replace('\n', ',')
                 .replace('•', ',')
                 .replace('-', ',')
@@ -244,7 +240,7 @@
                 <i class="fas fa-envelope"></i>
                 <div>
                     <span>Email</span>
-                    {% set email = profile[8] if profile and profile|length > 8 and profile[8] else "" %}
+                    {% set email = profile[9] if profile and profile|length > 9 and profile[9] else "" %}
                     <a href="mailto:{{ email }}">
                         {{ email if email else "Not available" }}
                     </a>
@@ -255,7 +251,7 @@
                 <i class="fas fa-location-dot"></i>
                 <div>
                     <span>Location</span>
-                    <p>{{ profile[9] if profile and profile|length > 9 and profile[9] else "Not available" }}</p>
+                    <p>{{ profile[10] if profile and profile|length > 10 and profile[10] else "Not available" }}</p>
                 </div>
             </div>
 
@@ -263,7 +259,7 @@
                 <i class="fas fa-briefcase"></i>
                 <div>
                     <span>Status</span>
-                    <p>{{ profile[10] if profile and profile|length > 10 and profile[10] else "Not available" }}</p>
+                    <p>{{ profile[11] if profile and profile|length > 11 and profile[11] else "Not available" }}</p>
                 </div>
             </div>
 
