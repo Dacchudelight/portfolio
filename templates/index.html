@@ -127,6 +127,23 @@
     </div>
 </section>
 
+<!-- SKILLS -->
+<section id="skills" class="skills-section" data-reveal>
+    <div class="section-header">
+        <h2 class="section-title">Skills</h2>
+    </div>
+
+    <div class="skills-container" data-reveal>
+        {% if profile and profile|length > 5 and profile[5] %}
+            {% for skill in profile[5].split(',') %}
+                <span class="skill-pill">{{ skill.strip() }}</span>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No skills added yet.</p>
+        {% endif %}
+    </div>
+</section>
+
 <!-- EXPERIENCE -->
 <section id="experience" data-reveal>
     <div class="section-header">

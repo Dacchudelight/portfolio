@@ -73,6 +73,14 @@ p{color:var(--text-secondary);line-height:1.7}
 .section-title{font-size:2.2rem;color:var(--text-primary);position:relative;display:inline-block}
 .section-title::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:50px;height:3px;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:4px}
 
+/* SKILLS */
+.skills-section{padding:1.5rem 5% 2rem;background:transparent;position:relative;z-index:1;scroll-margin-top:60px}
+.skills-container{display:flex;flex-wrap:wrap;justify-content:center;gap:.8rem;max-width:900px;margin:0 auto}
+.skill-pill{display:inline-flex;align-items:center;padding:.5rem 1.3rem;border-radius:var(--radius-full);font-size:.85rem;font-weight:600;color:var(--primary-light);background:var(--primary-soft);border:1px solid rgba(139,92,246,.2);position:relative;overflow:hidden;transition:all .35s cubic-bezier(.4,0,.2,1);cursor:default}
+.skill-pill::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(6,182,212,.08));opacity:0;transition:opacity .35s}
+.skill-pill:hover{transform:translateY(-3px) scale(1.05);border-color:var(--primary);box-shadow:0 6px 20px rgba(139,92,246,.2);color:#fff}
+.skill-pill:hover::before{opacity:1}
+
 /* TIMELINE */
 #experience,#education{padding:1.5rem 5% 2rem;scroll-margin-top:60px;background:transparent;position:relative;z-index:1}
 .timeline{max-width:800px;margin:0 auto;position:relative;padding-left:30px}
@@ -213,7 +221,7 @@ body.light-theme .nav-links{background:rgba(248,250,252,0.97)}
 .footer-content{flex-direction:column;text-align:center}
 .section-title{font-size:1.6rem}
 .section-header{margin-bottom:1.5rem}
-#experience,#education,.projects-section,.certificates-section,.contact-section{padding:2.5rem 4% 3rem}
+#experience,#education,.projects-section,.certificates-section,.contact-section,.skills-section{padding:2.5rem 4% 3rem}
 h1{font-size:2rem}
 .hero{padding:5.5rem 4% 2.5rem;min-height:auto}
 }
