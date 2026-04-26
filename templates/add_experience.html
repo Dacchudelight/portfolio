@@ -14,76 +14,92 @@
     </div>
   {% endif %}
 {% endwith %}
-<!-- 🔹 TOP BAR -->
+
+<!-- TOP BAR -->
 <div class="top-bar">
     <h2>💼 Experience</h2>
-
     <div class="top-buttons">
         <a href="/" class="btn home">🏠 Home</a>
         <a href="/admin" class="btn back">⬅ Back</a>
     </div>
 </div>
 
-<!-- 🔹 MAIN LAYOUT -->
-<div class="main-container">
-
-    <!-- 🔹 LEFT: ADD FORM -->
-    
-<!-- 🔹 LEFT: ADD FORM -->
-<div class="form-box">
-    <h3>Add Experience</h3>
-
-    <form method="POST" action="/add_experience">
-        <input type="text" name="role" placeholder="Role" required>
-        <input type="text" name="company" placeholder="Company" required>
-        <input type="text" name="duration" placeholder="Duration" required>
-        <textarea name="description" placeholder="Description" required></textarea>
-
-        <button type="submit" class="btn add">Add Experience</button>
-    </form>
-</div>
-
-<!-- 🔹 RIGHT: EXPERIENCE LIST -->
-<div class="list-box">
-    <h3>Your Experience</h3>
-
-    {% for exp in experience %}
-    <div class="exp-card">
-
-        <form method="POST" action="/update_experience/{{ exp[0] }}">
-
-            <!-- 🔹 INPUT FIELDS -->
-            <input type="text" name="role" value="{{ exp[1] }}" required>
-            <input type="text" name="company" value="{{ exp[2] }}" required>
-            <input type="text" name="duration" value="{{ exp[3] }}" required>
-            <textarea name="description" required>{{ exp[4] }}</textarea>
-
-            <!-- 🔹 ACTION BUTTONS -->
-            <div class="exp-actions">
-
-                <!-- UPDATE -->
-                <button type="submit" class="btn edit">
-                    ✏️ Update
-                </button>
-
-                <!-- DELETE (SAFE - POST) -->
-                <button type="submit"
-                        formaction="/delete_experience/{{ exp[0] }}"
-                        formmethod="POST"
-                        class="btn delete"
-                        onclick="return confirm('Delete this experience?');">
-                    🗑 Delete
-                </button>
-
-            </div>
-
+<!-- FRESHER / EXPERIENCED TOGGLE -->
+<div class="toggle-section">
+    <h3>What's your current status?</h3>
+    <div class="toggle-wrapper">
+        <form method="POST" action="/toggle_fresher_mode" class="toggle-form">
+            <input type="hidden" name="mode" value="fresher">
+            <button type="submit" class="toggle-btn {% if fresher_mode %}active{% endif %}">
+                🎓 Fresher
+            </button>
         </form>
-
+        <form method="POST" action="/toggle_fresher_mode" class="toggle-form">
+            <input type="hidden" name="mode" value="experienced">
+            <button type="submit" class="toggle-btn {% if not fresher_mode %}active{% endif %}">
+                💼 Experienced
+            </button>
+        </form>
+    </div>
+    {% if fresher_mode %}
+    <div class="fresher-badge">
+        <span class="fresher-dot"></span>
+        Currently set as <strong>Fresher</strong> — visitors will see "Fresher | Actively seeking opportunities"
     </div>
     {% else %}
-        <p class="empty">No experience added yet.</p>
-    {% endfor %}
+    <div class="experienced-badge">
+        <span class="exp-dot"></span>
+        Currently set as <strong>Experienced</strong> — visitors will see your experience entries below
+    </div>
+    {% endif %}
+</div>
+
+<!-- MAIN LAYOUT (only show when experienced mode) -->
+{% if not fresher_mode %}
+<div class="main-container">
+
+    <!-- LEFT: ADD FORM -->
+    <div class="form-box">
+        <h3>Add Experience</h3>
+        <form method="POST" action="/add_experience">
+            <input type="text" name="role" placeholder="Role" required>
+            <input type="text" name="company" placeholder="Company" required>
+            <input type="text" name="duration" placeholder="Duration" required>
+            <textarea name="description" placeholder="Description" required></textarea>
+            <button type="submit" class="btn add">Add Experience</button>
+        </form>
+    </div>
+
+    <!-- RIGHT: EXPERIENCE LIST -->
+    <div class="list-box">
+        <h3>Your Experience</h3>
+        {% for exp in experience %}
+        <div class="exp-card">
+            <form method="POST" action="/update_experience/{{ exp[0] }}">
+                <input type="text" name="role" value="{{ exp[1] }}" required>
+                <input type="text" name="company" value="{{ exp[2] }}" required>
+                <input type="text" name="duration" value="{{ exp[3] }}" required>
+                <textarea name="description" required>{{ exp[4] }}</textarea>
+                <div class="exp-actions">
+                    <button type="submit" class="btn edit">✏️ Update</button>
+                    <button type="submit"
+                            formaction="/delete_experience/{{ exp[0] }}"
+                            formmethod="POST"
+                            class="btn delete"
+                            onclick="return confirm('Delete this experience?');">
+                        🗑 Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+            <p class="empty">No experience added yet.</p>
+        {% endfor %}
+    </div>
 
 </div>
-<script src="{{ url_for('static', filename='js/add_education.js') }}"></script></body>
+{% endif %}
+
+<script src="{{ url_for('static', filename='js/add_education.js') }}"></script>
+</body>
 </html>

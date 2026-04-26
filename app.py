@@ -79,6 +79,7 @@ def home():
             experience=[]   # ✅ added
         )
 
+    fresher_mode = False
     try:
         c = conn.cursor()
 
@@ -94,13 +95,28 @@ def home():
         c.execute("SELECT * FROM education ORDER BY id DESC")
         education = c.fetchall()
 
-        # ✅ ADD THIS
         c.execute("SELECT * FROM experience ORDER BY id DESC")
         experience = c.fetchall()
 
+        # Check fresher mode
+        try:
+            c.execute("SELECT fresher_mode FROM settings WHERE id=1")
+            row = c.fetchone()
+            fresher_mode = bool(row and row[0]) if row else False
+        except Exception:
+            # Create settings table if not exists
+            try:
+                c.execute("CREATE TABLE IF NOT EXISTS settings (id SERIAL PRIMARY KEY, fresher_mode BOOLEAN DEFAULT TRUE)")
+                c.execute("INSERT INTO settings (id, fresher_mode) VALUES (1, TRUE) ON CONFLICT (id) DO NOTHING")
+                conn.commit()
+                fresher_mode = True
+            except Exception as e2:
+                print("Settings table error:", e2)
+                fresher_mode = True
+
     except Exception as e:
         print("[ERROR] HOME ERROR:", e)
-        projects, certificates, profile, education, experience = [], [], None, [], []  # ✅ updated
+        projects, certificates, profile, education, experience = [], [], None, [], []
 
     finally:
         if conn:
@@ -112,7 +128,8 @@ def home():
         certificates=certificates,
         profile=profile,
         education=education,
-        experience=experience   # ✅ added
+        experience=experience,
+        fresher_mode=fresher_mode
     )
 
 @app.route("/login", methods=["GET", "POST"])
@@ -850,6 +867,31 @@ def delete_education(id):
 
 from flask import flash   # 🔹 make sure this is imported
 
+@app.route("/toggle_fresher_mode", methods=["POST"])
+def toggle_fresher_mode():
+    if "user" not in session:
+        return redirect("/login")
+
+    mode = request.form.get("mode", "fresher")
+    fresher = (mode == "fresher")
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    try:
+        c.execute("CREATE TABLE IF NOT EXISTS settings (id SERIAL PRIMARY KEY, fresher_mode BOOLEAN DEFAULT TRUE)")
+        c.execute("INSERT INTO settings (id, fresher_mode) VALUES (1, %s) ON CONFLICT (id) DO UPDATE SET fresher_mode = %s", (fresher, fresher))
+        conn.commit()
+        flash("Mode updated to " + ("Fresher" if fresher else "Experienced"), "success")
+    except Exception as e:
+        print("Toggle error:", e)
+        flash("Failed to update mode", "error")
+    finally:
+        conn.close()
+
+    return redirect("/add_experience")
+
+
 @app.route("/add_experience", methods=["GET", "POST"])
 def add_experience():
     if "user" not in session:
@@ -870,16 +912,25 @@ def add_experience():
         )
         conn.commit()
 
-        flash("Experience Added Successfully", "success")  # ✅ ADD THIS
+        flash("Experience Added Successfully", "success")
 
         return redirect("/add_experience")
 
     c.execute("SELECT * FROM experience ORDER BY id DESC")
     experience = c.fetchall()
 
+    # Get fresher mode
+    fresher_mode = True
+    try:
+        c.execute("SELECT fresher_mode FROM settings WHERE id=1")
+        row = c.fetchone()
+        fresher_mode = bool(row and row[0]) if row else True
+    except Exception:
+        fresher_mode = True
+
     conn.close()
 
-    return render_template("add_experience.html", experience=experience)
+    return render_template("add_experience.html", experience=experience, fresher_mode=fresher_mode)
 
 
 @app.route("/update_experience/<int:id>", methods=["POST"])

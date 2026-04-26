@@ -1,486 +1,107 @@
 /* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+*{margin:0;padding:0;box-sizing:border-box}
 
 /* BODY */
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
-}
+body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
 
 /* NAVBAR */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background: #020617;
-    border-bottom: 1px solid #1e293b;
-}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:#020617;border-bottom:1px solid #1e293b;flex-wrap:wrap;gap:10px}
+.navbar h2{font-size:18px;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.nav-buttons{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 
-.navbar h2 {
-    font-size: 20px;
-}
+/* BASE BUTTON */
+.btn,.nav-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;color:#fff;border:none;cursor:pointer;transition:all .3s;white-space:nowrap;letter-spacing:.02em}
+.btn:hover,.nav-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
 
-/* BUTTONS */
-.btn {
-    padding: 8px 14px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 14px;
-    background: #334155;
-    color: white;
-    transition: 0.3s;
-}
-
-.btn:hover {
-    opacity: 0.85;
-}
-
-.btn.primary {
-    background: #3b82f6;
-}
-
-.btn.edit {
-    background: #22c55e;
-}
-
-.btn.danger {
-    background: #ef4444;
-}
+/* INDIVIDUAL BUTTON COLORS */
+.nav-buttons > a:nth-child(1){background:linear-gradient(135deg,#3b82f6,#2563eb);box-shadow:0 4px 12px rgba(59,130,246,.35)}
+.nav-buttons > a:nth-child(2){background:linear-gradient(135deg,#8b5cf6,#7c3aed);box-shadow:0 4px 12px rgba(139,92,246,.35)}
+.nav-buttons > a:nth-child(3){background:linear-gradient(135deg,#06b6d4,#0891b2);box-shadow:0 4px 12px rgba(6,182,212,.35)}
+.nav-buttons > a:nth-child(4){background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 12px rgba(245,158,11,.35)}
+.nav-buttons > a:nth-child(5){background:linear-gradient(135deg,#ec4899,#db2777);box-shadow:0 4px 12px rgba(236,72,153,.35)}
+.nav-buttons > a:nth-child(6){background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 4px 12px rgba(16,185,129,.35)}
+.nav-buttons > a:nth-child(7){background:linear-gradient(135deg,#f97316,#ea580c);box-shadow:0 4px 12px rgba(249,115,22,.35)}
+.nav-buttons > a:nth-child(8){background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 4px 12px rgba(239,68,68,.35)}
 
 /* CONTAINER */
-.container {
-    padding: 40px;
-    max-width: 900px;
-    margin: auto;
-}
+.container{padding:28px 24px;max-width:920px;margin:auto}
 
 /* HEADER */
-.header-section {
-    margin-bottom: 25px;
-}
+.header-section{margin-bottom:20px}
+.header-section h3{font-size:22px;color:#fff}
+.header-section p{font-size:14px;color:#94a3b8;margin-top:4px}
 
-.header-section h3 {
-    font-size: 24px;
-}
-
-.header-section p {
-    font-size: 14px;
-    color: #94a3b8;
-}
+/* PROJECT LIST */
+.project-list{display:flex;flex-direction:column;gap:16px}
 
 /* PROJECT CARD */
-.project-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+.project-card{position:relative;background:linear-gradient(145deg,#0f172a,#1e293b);border:1px solid #1e293b;padding:20px;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:.3s ease}
+.project-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,.4)}
 
-.project-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #1e293b;
-    padding: 18px;
-    border-radius: 12px;
-    transition: 0.3s;
-}
-
-.project-card:hover {
-    transform: scale(1.01);
-    background: #273449;
-}
-
-.project-content h4 {
-    margin-bottom: 5px;
-}
-
-.project-content p {
-    font-size: 14px;
-    color: #94a3b8;
-}
+/* PROJECT CONTENT */
+.project-content{margin-bottom:10px}
+.project-content h4{font-size:17px;margin-bottom:5px;color:#fff;word-wrap:break-word}
+.project-content p{font-size:13px;color:#cbd5e1;line-height:1.6;word-wrap:break-word}
 
 /* ACTIONS */
-.project-actions {
-    display: flex;
-    gap: 10px;
-}
+.project-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:12px}
+.action-left{display:flex;gap:8px;flex-wrap:wrap}
 
-/* EMPTY STATE */
-.empty {
-    text-align: center;
-    color: #64748b;
-}
-.btn.primary {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: white;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(34,197,94,0.4);
-}
+/* EDIT BUTTON */
+.btn.edit{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 3px 10px rgba(34,197,94,.3)}
+.btn.edit:hover{transform:scale(1.04)}
 
-.btn.primary:hover {
-    transform: translateY(-2px);
-}
-/* 🔹 BASE BUTTON */
-.btn {
-    text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    color: white;
-    transition: 0.3s;
-}
+/* DELETE BUTTON */
+.btn.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;box-shadow:0 3px 10px rgba(239,68,68,.3)}
+.btn.danger:hover{transform:scale(1.04)}
+.btn.small{padding:3px 8px;font-size:11px}
 
-/* 🟢 PRIMARY (MAIN ACTION) */
-.btn.primary {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(34,197,94,0.4);
-}
+/* PRIMARY (Add) */
+.btn.primary{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:600;box-shadow:0 3px 10px rgba(34,197,94,.3)}
+.btn.primary:hover{transform:scale(1.04)}
 
-.btn.primary:hover {
-    transform: translateY(-2px);
-}
+/* UPLOAD BOX */
+.upload-box{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:rgba(255,255,255,.04);padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.06)}
+.upload-box input[type="file"]{font-size:12px;color:#cbd5e1;max-width:200px}
+.upload-box input[type="file"]::file-selector-button{background:#1e293b;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;transition:.2s;font-size:12px}
+.upload-box input[type="file"]::file-selector-button:hover{background:#334155}
 
-/* 🔵 SECONDARY */
-.btn.secondary {
-    background: #d112c1;
-    border: 1px solid #334155;
-}
+/* SCREENSHOTS */
+.screenshot-list{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.screenshot-item{position:relative}
+.screenshot-item img{width:80px;height:60px;object-fit:cover;border-radius:6px}
+.screenshot-item form{position:absolute;top:-6px;right:-6px}
 
-.btn.secondary:hover {
-    background: #b323b0;
-}
+/* TOAST */
+.toast-container{position:fixed;top:70px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{padding:12px 18px;border-radius:10px;font-size:14px;font-weight:500;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.2);animation:slideIn .3s ease,fadeOut 3s forwards}
+.toast.success{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.toast.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeOut{80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
 
-/* 🔴 DANGER */
-.btn.danger {
-    background: #ef4444;
-}
+/* EMPTY */
+.empty{color:#94a3b8;text-align:center;margin-top:20px;font-size:14px}
 
-.btn.danger:hover {
-    background: #dc2626;
+/* ===== MOBILE ===== */
+@media(max-width:768px){
+    .navbar{flex-direction:column;align-items:flex-start;padding:14px 16px;gap:10px}
+    .navbar h2{font-size:16px}
+    .nav-buttons{width:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+    .btn,.nav-btn{padding:8px 10px;font-size:12px;text-align:center;justify-content:center;border-radius:8px}
+    .container{padding:16px 12px}
+    .project-card{padding:14px}
+    .project-content h4{font-size:15px}
+    .project-content p{font-size:12px}
+    .project-actions{flex-direction:column;align-items:flex-start;gap:8px}
+    .action-left{width:100%}
+    .upload-box{width:100%}
+    .upload-box input[type="file"]{max-width:100%;width:100%}
+    .screenshot-list{position:static!important;flex-direction:row}
+    .screenshot-item img{width:60px;height:45px}
 }
-.upload-btn {
-    display: inline-block;
-    padding: 10px 22px;
-    background: #007bff;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-}
-
-.upload-btn:hover {
-    background: #0056b3;
-    transform: translateY(-1px);
-}
-.upload {
-    background: linear-gradient(135deg, #ff9800, #ff5722);
-}
-
-.upload:hover {
-    background: linear-gradient(135deg, #fb8c00, #e64a19);
-}
-.nav-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    transition: 0.3s;
-}
-/* 🔹 BASE TOAST */
-.toast {
-    position: fixed;
-    top: 70px;   /* ⬅️ move below navbar */
-    right: 20px;
-
-    padding: 12px 18px;
-    border-radius: 8px;
-
-    font-size: 14px;
-    font-weight: 500;
-    color: #fff;
-
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    z-index: 9999;
-
-    animation: slideIn 0.3s ease, fadeOut 3s forwards;
-}
-
-/* 🟢 SUCCESS */
-.toast.success {
-    background: linear-gradient(135deg, #22c55e, #16a34a); /* 🟢 */
-}
-
-.toast.error {
-    background: linear-gradient(135deg, #ef4444, #dc2626); /* 🔴 */
-}
-
-/* 🔹 ANIMATIONS */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes fadeOut {
-    80% { opacity: 1; }
-    100% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-}
-.project-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.project-content {
-    max-width: 70%;
-}
-/* 🔹 PROJECT CARD LAYOUT */
-.project-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 30px;
-    padding: 20px;
-    border-radius: 12px;
-    background: linear-gradient(145deg, #0f172a, #1e293b);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    margin-bottom: 20px;
-    transition: 0.3s ease;
-}
-
-.project-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-}
-
-/* 🔹 TEXT AREA */
-.project-content {
-    flex: 1;
-}
-
-.project-content h4 {
-    font-size: 18px;
-    margin-bottom: 6px;
-    color: #ffffff;
-}
-
-.project-content p {
-    font-size: 14px;
-    color: #cbd5f5;
-    line-height: 1.5;
-}
-
-/* 🔹 ACTION CONTAINER */
-.project-actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-/* 🔹 LEFT SIDE (EDIT + DELETE) */
-.action-left {
-    display: flex;
-    gap: 10px;
-}
-
-/* 🔹 BUTTON BASE */
-.btn {
-    padding: 6px 12px;
-    font-size: 13px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    transition: 0.25s ease;
-}
-
-/* 🔹 EDIT BUTTON */
-.btn.edit {
-    background: linear-gradient(135deg, #00c853, #00e676);
-    color: #000;
-}
-
-.btn.edit:hover {
-    transform: scale(1.05);
-}
-
-/* 🔹 DELETE BUTTON */
-.btn.danger {
-    background: linear-gradient(135deg, #ff5252, #ff1744);
-    color: #fff;
-}
-
-.btn.danger:hover {
-    transform: scale(1.05);
-}
-
-/* 🔹 UPLOAD BOX */
-.upload-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255,255,255,0.05);
-    padding: 6px 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.08);
-}
-
-/* 🔹 FILE INPUT */
-.upload-box input[type="file"] {
-    font-size: 12px;
-    color: #cbd5f5;
-}
-
-/* 🔥 CUSTOM FILE BUTTON */
-.upload-box input[type="file"]::file-selector-button {
-    background: #1e293b;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.upload-box input[type="file"]::file-selector-button:hover {
-    background: #334155;
-}
-
-/* 🔹 ADD BUTTON */
-.btn.primary {
-    background: linear-gradient(135deg, #00c853, #69f0ae);
-    color: #000;
-    font-weight: 600;
-}
-
-.btn.primary:hover {
-    transform: scale(1.05);
-}
-
-/* 🔹 HEADER SECTION */
-.header-section h3 {
-    font-size: 22px;
-    color: #ffffff;
-}
-
-.header-section p {
-    font-size: 14px;
-    color: #94a3b8;
-}
-
-/* 🔹 EMPTY TEXT */
-.empty {
-    color: #94a3b8;
-    text-align: center;
-    margin-top: 20px;
-}
-.screenshot-list {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-}
-
-.screenshot-item {
-    position: relative;
-}
-
-.screenshot-item img {
-    width: 80px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-.screenshot-item form {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-}
-
-.btn.small {
-    padding: 2px 6px;
-    font-size: 10px;
-}
-/* 🔹 KEEP CARD NORMAL */
-.project-card {
-    position: relative;
-}
-
-/* 🔹 ACTIONS ALIGN PROPERLY */
-.project-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-/* 🔹 LEFT BUTTONS */
-.action-left {
-    display: flex;
-    gap: 10px;
-}
-
-/* 🔹 UPLOAD BOX */
-.upload-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* 🔹 SCREENSHOTS POSITION (RIGHT SIDE CLEAN) */
-.screenshot-list {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* 🔹 IMAGE STYLE */
-.screenshot-item img {
-    width: 90px;
-    height: 70px;
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-/* 🔹 DELETE BUTTON FIX */
-.screenshot-item {
-    position: relative;
-}
-
-.delete-btn {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: #ff4d4d;
-    border: none;
-    color: white;
-    font-size: 12px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    cursor: pointer;
+@media(max-width:480px){
+    .nav-buttons{grid-template-columns:repeat(2,1fr)}
+    .btn,.nav-btn{padding:7px 8px;font-size:11px}
+    .project-card{padding:12px}
 }

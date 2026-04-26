@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta name="description" content="Portfolio of {{ profile[1] if profile and profile[1] else 'Developer' }} — {{ profile[2] if profile and profile[2] else 'Professional' }}">
+
     <title>
         {{ profile[1] if profile and profile[1] else "Your Name" }} | 
         {{ profile[2] if profile and profile[2] else "Your Role" }}
     </title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
+<canvas id="particleCanvas"></canvas>
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         <div class="flash-container">
@@ -29,133 +31,166 @@
     {% endif %}
 {% endwith %}
 
-<!-- 🔹 NAVBAR -->
-<nav class="navbar">
+<!-- NAVBAR -->
+<nav class="navbar" id="mainNav">
     <h2 class="logo">
         {{ profile[12] if profile and profile|length > 12 and profile[12] else "Portfolio" }}
     </h2>
 
-    <div class="nav-links">
-    <a href="#" onclick="goHome(event)">Home</a>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+    </button>
 
-    <!-- KEEP your function -->
-    <a href="#" onclick="showExperience(event)">Experience</a>
-
-    <!-- 🔥 FIXED (no breaking change) -->
-    <a href="#" onclick="showEducation(event)">Education</a>
-
-    <!-- KEEP existing functionality -->
-    <a href="#" onclick="showProjects(event)">Projects</a>
-    <a href="#" onclick="showCertificates(event)">Certificates</a>
-
-    <a href="{{ url_for('download_resume') }}" class="resume-btn">Download Resume</a>
-    <a href="{{ url_for('login') }}" class="btn">Admin</a>
-    <button id="themeToggle" class="btn">🌙</button>
-</div>
+    <div class="nav-links" id="navLinks">
+        <a href="#" onclick="goHome(event)" class="nav-link active">Home</a>
+        <a href="#" onclick="showExperience(event)" class="nav-link">Experience</a>
+        <a href="#" onclick="showEducation(event)" class="nav-link">Education</a>
+        <a href="#" onclick="showProjects(event)" class="nav-link">Projects</a>
+        <a href="#" onclick="showCertificates(event)" class="nav-link">Certificates</a>
+        <a href="#" onclick="showContact(event)" class="nav-link">Contact</a>
+        <a href="{{ url_for('download_resume') }}" class="nav-link resume-btn"><i class="fas fa-download"></i> Resume</a>
+        <a href="{{ url_for('login') }}" class="nav-link admin-btn"><i class="fas fa-lock"></i> Admin</a>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+    </div>
 </nav>
 
-<!-- 🔹 HERO -->
-<section class="hero">
+<!-- HERO -->
+<section class="hero" id="hero">
+    <div class="hero-content">
+        <div class="hero-image" data-reveal>
+            {% if profile and profile|length > 4 and profile[4] and profile[4].startswith('http') %}
+                <div class="image-ring">
+                    <img src="{{ profile[4] }}" alt="Profile Image">
+                </div>
+            {% else %}
+                <div class="image-ring">
+                    <img src="{{ url_for('static', filename='default.png') }}" alt="Default Image">
+                </div>
+            {% endif %}
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                {{ profile[11] if profile and profile|length > 11 and profile[11] else "Available" }}
+            </div>
+        </div>
 
-<div class="hero-text">
-    {% if profile %}
-        <h1>{{ profile[1] if profile and profile[1] else "Your Name" }}</h1>
+        <div class="hero-text" data-reveal>
+            {% if profile %}
+                <p class="hero-greeting">Hello, I'm</p>
+                <h1>{{ profile[1] if profile and profile[1] else "Your Name" }}</h1>
 
-        <p class="aspiring-text">
-            {{ profile[14] if profile and profile|length > 14 and profile[14] else "Aspiring" }}
-        </p>
+                <p class="aspiring-text">
+                    {{ profile[14] if profile and profile|length > 14 and profile[14] else "Aspiring" }}
+                </p>
 
-        <p class="role highlight-role">
-            {{ profile[2] if profile and profile[2] else "" }}
-        </p>
+                <p class="role">
+                    <span class="typewriter" id="typewriter">{{ profile[2] if profile and profile[2] else "" }}</span>
+                    <span class="cursor-blink">|</span>
+                </p>
 
-        <p class="bio">
-            {{ profile[3] if profile and profile[3] else "Your bio..." }}
-        </p>
+                <p class="bio">
+                    {{ profile[3] if profile and profile[3] else "Your bio..." }}
+                </p>
+            {% else %}
+                <p class="hero-greeting">Hello, I'm</p>
+                <h1>Your Name</h1>
+                <p class="role">Your Role</p>
+                <p class="bio">Your bio will appear here</p>
+            {% endif %}
 
-    {% else %}
-        <h1>Your Name</h1>
-        <p>Your Role</p>
-        <p>Your bio will appear here</p>
-    {% endif %}
+            <div class="hero-buttons">
+                <button id="btn-projects" class="btn btn-primary" onclick="showProjects(event)">
+                    <i class="fas fa-folder-open"></i> View Projects
+                </button>
+                <button id="btn-certificates" class="btn btn-outline" onclick="showCertificates(event)">
+                    <i class="fas fa-certificate"></i> View Certificates
+                </button>
+            </div>
 
-    <div class="hero-buttons">
-        <button id="btn-projects" class="btn btn-main active-btn" onclick="showProjects(event)">
-            View Projects
-        </button>
-
-        <button id="btn-certificates" class="btn btn-main" onclick="showCertificates(event)">
-            View Certificates
-        </button>
+            <div class="social-links">
+                {% if profile and profile|length > 6 and profile[6] %}
+                    <a href="{{ profile[6] }}" target="_blank" class="social-icon linkedin" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                {% endif %}
+                {% if profile and profile|length > 7 and profile[7] %}
+                    <a href="{{ profile[7] }}" target="_blank" class="social-icon github" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                {% endif %}
+                {% if profile and profile|length > 8 and profile[8] %}
+                    <a href="{{ profile[8] }}" target="_blank" class="social-icon instagram" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
-
-    <div class="social-links">
-
-        {% if profile and profile|length > 6 and profile[6] %}
-            <a href="{{ profile[6] }}" target="_blank" class="social-icon linkedin">
-                <i class="fab fa-linkedin-in"></i>
-            </a>
-        {% endif %}
-
-        {% if profile and profile|length > 7 and profile[7] %}
-            <a href="{{ profile[7] }}" target="_blank" class="social-icon github">
-                <i class="fab fa-github"></i>
-            </a>
-        {% endif %}
-
-        {% if profile and profile|length > 8 and profile[8] %}
-            <a href="{{ profile[8] }}" target="_blank" class="social-icon instagram">
-                <i class="fab fa-instagram"></i>
-            </a>
-        {% endif %}
-
-    </div>
-</div>
-
-<div class="hero-image">
-    {% if profile and profile|length > 4 and profile[4] and profile[4].startswith('http') %}
-        <img src="{{ profile[4] }}" alt="Profile Image">
-    {% else %}
-        <img src="{{ url_for('static', filename='default.png') }}" alt="Default Image">
-    {% endif %}
-</div>
-
 </section>
 
-<!-- 🔹 EXPERIENCE -->
-<section id="experience">
-    <h2 class="section-title">💼 Experience</h2>
+<!-- EXPERIENCE -->
+<section id="experience" data-reveal>
+    <div class="section-header">
+        <h2 class="section-title">Experience</h2>
+    </div>
 
-    <div class="experience-container">
+    {% if fresher_mode %}
+    <div class="fresher-card" data-reveal>
+        <div class="fresher-content">
+            <div class="fresher-icon">🎓</div>
+            <h3>Fresher</h3>
+            <p>I'm a recent graduate actively seeking opportunities to kickstart my career. Eager to learn, grow, and contribute to impactful projects.</p>
+            <div class="fresher-status">
+                <span class="fresher-pulse"></span>
+                Actively seeking opportunities
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="timeline">
         {% if experience and experience|length > 0 %}
             {% for exp in experience %}
-            <div class="experience-card">
-                <div class="exp-role">{{ exp[1] if exp and exp|length > 1 and exp[1] else "" }}</div>
-                <div class="exp-company">{{ exp[2] if exp and exp|length > 2 and exp[2] else "" }}</div>
-                <div class="exp-duration">{{ exp[3] if exp and exp|length > 3 and exp[3] else "" }}</div>
-                <div class="exp-desc">{{ exp[4] if exp and exp|length > 4 and exp[4] else "" }}</div>
+            <div class="timeline-item" data-reveal>
+                <div class="timeline-dot"></div>
+                <div class="timeline-card">
+                    <div class="timeline-header">
+                        <div>
+                            <div class="exp-role">{{ exp[1] if exp and exp|length > 1 and exp[1] else "" }}</div>
+                            <div class="exp-company"><i class="fas fa-building"></i> {{ exp[2] if exp and exp|length > 2 and exp[2] else "" }}</div>
+                        </div>
+                        <div class="exp-duration"><i class="fas fa-calendar-alt"></i> {{ exp[3] if exp and exp|length > 3 and exp[3] else "" }}</div>
+                    </div>
+                    <div class="exp-desc">{{ exp[4] if exp and exp|length > 4 and exp[4] else "" }}</div>
+                </div>
             </div>
             {% endfor %}
         {% else %}
             <p class="empty">No experience available.</p>
         {% endif %}
     </div>
+    {% endif %}
 </section>
 
-<!-- 🔹 EDUCATION -->
-<section id="education">
-    <h2 class="section-title">🎓 Education</h2>
+<!-- EDUCATION -->
+<section id="education" data-reveal>
+    <div class="section-header">
+        <h2 class="section-title">Education</h2>
+    </div>
 
-    <div class="education-container">
+    <div class="timeline">
         {% if education and education|length > 0 %}
             {% for edu in education %}
-            <div class="education-box">
-                <div class="edu-left">
-                    <h3>{{ edu[1] if edu and edu|length > 1 and edu[1] else "" }}</h3>
-                    <p class="edu-institution">{{ edu[2] if edu and edu|length > 2 and edu[2] else "" }}</p>
-                    <p class="edu-desc">{{ edu[4] if edu and edu|length > 4 and edu[4] else "" }}</p>
+            <div class="timeline-item" data-reveal>
+                <div class="timeline-dot"></div>
+                <div class="timeline-card">
+                    <div class="timeline-header">
+                        <div>
+                            <h3>{{ edu[1] if edu and edu|length > 1 and edu[1] else "" }}</h3>
+                            <p class="edu-institution"><i class="fas fa-university"></i> {{ edu[2] if edu and edu|length > 2 and edu[2] else "" }}</p>
+                            <p class="edu-desc">{{ edu[4] if edu and edu|length > 4 and edu[4] else "" }}</p>
+                        </div>
+                        <div class="edu-year"><i class="fas fa-calendar-alt"></i> {{ edu[3] if edu and edu|length > 3 and edu[3] else "" }}</div>
+                    </div>
                 </div>
-                <div class="edu-right">{{ edu[3] if edu and edu|length > 3 and edu[3] else "" }}</div>
             </div>
             {% endfor %}
         {% else %}
@@ -164,38 +199,38 @@
     </div>
 </section>
 
-<section id="projects-section" class="projects hidden-section">
-    <h2>📊Projects</h2>
+<!-- PROJECTS -->
+<section id="projects-section" class="projects-section" data-reveal>
+    <div class="section-header">
+        <h2 class="section-title">Projects</h2>
+    </div>
 
-    <div class="grid">
+    <div class="projects-grid">
         {% if projects and projects|length > 0 %}
             {% for p in projects %}
-            <div class="card">
+            <div class="project-card" data-reveal>
+                <div class="card-glow"></div>
                 <h3>{{ p[1] if p and p|length > 1 and p[1] else "" }}</h3>
                 <p>{{ p[2] if p and p|length > 2 and p[2] else "" }}</p>
 
                 {% if p and p|length > 3 and p[3] %}
                 <div class="tags">
-                    <span>{{ p[3] }}</span>
+                    {% for tag in p[3].split(',') %}
+                        <span>{{ tag.strip() }}</span>
+                    {% endfor %}
                 </div>
                 {% endif %}
 
                 {% if p and p|length > 4 and p[4] and p[4].startswith('http') %}
                 <div class="project-links">
-
-                    <!-- EXISTING LINK (UNCHANGED) -->
                     <a href="{{ p[4] }}" target="_blank" class="link-btn">
-                        View Project →
+                        <i class="fas fa-external-link-alt"></i> View Project
                     </a>
-
-                    <!-- 🔥 UPDATED LINK (CONNECTED TO BACKEND) -->
                     <a href="/project/{{ p[0] }}/screenshots" class="link-btn screenshots">
-                        View Screenshots →
+                        <i class="fas fa-images"></i> Screenshots
                     </a>
-
                 </div>
                 {% endif %}
-
             </div>
             {% endfor %}
         {% else %}
@@ -204,58 +239,58 @@
     </div>
 </section>
 
-
-<!-- 🔹 CERTIFICATES -->
-<section id="certificates-section" class="projects hidden-section">
-    <h2>🎓 Certificates</h2>
+<!-- CERTIFICATES -->
+<section id="certificates-section" class="certificates-section" data-reveal>
+    <div class="section-header">
+        <h2 class="section-title">Certificates</h2>
+    </div>
 
     <div class="cert-grid">
-
         {% if certificates and certificates|length > 0 %}
             {% for c in certificates %}
-            <div class="certificate-card">
-
+            <div class="certificate-card" data-reveal>
                 {% if c and c|length > 3 and c[3] and c[3].startswith('http') %}
-                    <a href="{{ c[3] }}" target="_blank">
-                        <img src="{{ c[3] }}" alt="Certificate" class="cert-img">
-                    </a>
+                    <div class="cert-image-wrap">
+                        <a href="{{ c[3] }}" target="_blank">
+                            <img src="{{ c[3] }}" alt="Certificate" class="cert-img">
+                            <div class="cert-overlay"><i class="fas fa-expand"></i></div>
+                        </a>
+                    </div>
                 {% else %}
-                    <div class="no-image">No Image</div>
+                    <div class="cert-image-wrap no-image"><i class="fas fa-certificate"></i></div>
                 {% endif %}
 
-                <h4>{{ c[1] if c and c|length > 1 and c[1] else "" }}</h4>
-                <p>{{ c[2] if c and c|length > 2 and c[2] else "" }}</p>
-
+                <div class="cert-info">
+                    <h4>{{ c[1] if c and c|length > 1 and c[1] else "" }}</h4>
+                    <p>{{ c[2] if c and c|length > 2 and c[2] else "" }}</p>
+                </div>
             </div>
             {% endfor %}
         {% else %}
             <p class="empty">No certificates available.</p>
         {% endif %}
-
     </div>
 </section>
 
-<!-- 🔹 CONTACT -->
-<section class="contact-section">
-    <h2>Contact</h2>
+<!-- CONTACT -->
+<section class="contact-section" id="contact" data-reveal>
+    <div class="section-header">
+        <h2 class="section-title">Contact</h2>
+    </div>
 
     <div class="contact-container">
-
-        <div class="contact-info">
-
+        <div class="contact-info" data-reveal>
             <div class="contact-item">
-                <i class="fas fa-envelope"></i>
+                <div class="contact-icon"><i class="fas fa-envelope"></i></div>
                 <div>
                     <span>Email</span>
                     {% set email = profile[9] if profile and profile|length > 9 and profile[9] else "" %}
-                    <a href="mailto:{{ email }}">
-                        {{ email if email else "Not available" }}
-                    </a>
+                    <a href="mailto:{{ email }}">{{ email if email else "Not available" }}</a>
                 </div>
             </div>
 
             <div class="contact-item">
-                <i class="fas fa-location-dot"></i>
+                <div class="contact-icon"><i class="fas fa-location-dot"></i></div>
                 <div>
                     <span>Location</span>
                     <p>{{ profile[10] if profile and profile|length > 10 and profile[10] else "Not available" }}</p>
@@ -263,29 +298,50 @@
             </div>
 
             <div class="contact-item">
-                <i class="fas fa-briefcase"></i>
+                <div class="contact-icon"><i class="fas fa-briefcase"></i></div>
                 <div>
                     <span>Status</span>
                     <p>{{ profile[11] if profile and profile|length > 11 and profile[11] else "Not available" }}</p>
                 </div>
             </div>
-
         </div>
 
-        <form class="contact-form" method="POST" action="{{ url_for('contact') }}">
-            <input type="text" name="name" placeholder="Your Name" required>
-            <input type="email" name="email" placeholder="Your Email" required>
-            <textarea name="message" placeholder="Your Message" required></textarea>
-
-            <button type="submit" class="btn btn-main">Contact Me</button>
+        <form class="contact-form" method="POST" action="{{ url_for('contact') }}" data-reveal>
+            <div class="form-group">
+                <input type="text" name="name" id="contactName" placeholder=" " required>
+                <label for="contactName">Your Name</label>
+            </div>
+            <div class="form-group">
+                <input type="email" name="email" id="contactEmail" placeholder=" " required>
+                <label for="contactEmail">Your Email</label>
+            </div>
+            <div class="form-group">
+                <textarea name="message" id="contactMessage" placeholder=" " required></textarea>
+                <label for="contactMessage">Your Message</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit">
+                <i class="fas fa-paper-plane"></i> Send Message
+            </button>
         </form>
-
     </div>
 </section>
 
-<!-- 🔹 FOOTER -->
+<!-- FOOTER -->
 <footer>
-    {{ profile[13] if profile and profile|length > 13 and profile[13] else "© 2026 Darshan R | Data Analyst" }}
+    <div class="footer-content">
+        <p>{{ profile[13] if profile and profile|length > 13 and profile[13] else "© 2026 Darshan R | Data Analyst" }}</p>
+        <div class="footer-links">
+            {% if profile and profile|length > 6 and profile[6] %}
+                <a href="{{ profile[6] }}" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+            {% endif %}
+            {% if profile and profile|length > 7 and profile[7] %}
+                <a href="{{ profile[7] }}" target="_blank"><i class="fab fa-github"></i></a>
+            {% endif %}
+            {% if profile and profile|length > 8 and profile[8] %}
+                <a href="{{ profile[8] }}" target="_blank"><i class="fab fa-instagram"></i></a>
+            {% endif %}
+        </div>
+    </div>
 </footer>
 
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
