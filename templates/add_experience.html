@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experience</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_experience.css') }}">
+</head>
+<body>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="toast-container">
+      {% for category, msg in messages %}
+        <div class="toast {{ category }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+<!-- 🔹 TOP BAR -->
+<div class="top-bar">
+    <h2>💼 Experience</h2>
+
+    <div class="top-buttons">
+        <a href="/" class="btn home">🏠 Home</a>
+        <a href="/admin" class="btn back">⬅ Back</a>
+    </div>
+</div>
+
+<!-- 🔹 MAIN LAYOUT -->
+<div class="main-container">
+
+    <!-- 🔹 LEFT: ADD FORM -->
+    
+<!-- 🔹 LEFT: ADD FORM -->
+<div class="form-box">
+    <h3>Add Experience</h3>
+
+    <form method="POST" action="/add_experience">
+        <input type="text" name="role" placeholder="Role" required>
+        <input type="text" name="company" placeholder="Company" required>
+        <input type="text" name="duration" placeholder="Duration" required>
+        <textarea name="description" placeholder="Description" required></textarea>
+
+        <button type="submit" class="btn add">Add Experience</button>
+    </form>
+</div>
+
+<!-- 🔹 RIGHT: EXPERIENCE LIST -->
+<div class="list-box">
+    <h3>Your Experience</h3>
+
+    {% for exp in experience %}
+    <div class="exp-card">
+
+        <form method="POST" action="/update_experience/{{ exp[0] }}">
+
+            <!-- 🔹 INPUT FIELDS -->
+            <input type="text" name="role" value="{{ exp[1] }}" required>
+            <input type="text" name="company" value="{{ exp[2] }}" required>
+            <input type="text" name="duration" value="{{ exp[3] }}" required>
+            <textarea name="description" required>{{ exp[4] }}</textarea>
+
+            <!-- 🔹 ACTION BUTTONS -->
+            <div class="exp-actions">
+
+                <!-- UPDATE -->
+                <button type="submit" class="btn edit">
+                    ✏️ Update
+                </button>
+
+                <!-- DELETE (SAFE - POST) -->
+                <button type="submit"
+                        formaction="/delete_experience/{{ exp[0] }}"
+                        formmethod="POST"
+                        class="btn delete"
+                        onclick="return confirm('Delete this experience?');">
+                    🗑 Delete
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+    {% else %}
+        <p class="empty">No experience added yet.</p>
+    {% endfor %}
+
+</div>
+<script src="{{ url_for('static', filename='js/add_education.js') }}"></script></body>
+</html>

@@ -1465,6 +1465,9 @@ html {
 #education {
     scroll-margin-top: 100px; /* adjust based on navbar height */
 }
+#experience {
+    scroll-margin-top: 100px; /* adjust based on navbar height */
+}
 .edu-desc {
     margin-top: 6px;
     font-size: 13px;
@@ -1566,4 +1569,109 @@ body.light-theme .edu-institution {
 
 body.light-theme .edu-right {
     color: var(--primary) !important;
+}
+/* 🔹 EXPERIENCE SECTION */
+#experience {
+    padding: 80px 20px;
+    text-align: center;
+}
+
+#experience h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+/* Container */
+.experience-container {
+    max-width: 900px;
+    margin: 0 auto; /* centers horizontally */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Card */
+.experience-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px 25px;
+    border-radius: 12px;
+    text-align: left; /* content readable */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: 0.3s ease;
+}
+
+.experience-card:hover {
+    transform: translateY(-5px);
+    border-color: #00f7ff;
+}
+
+/* Title */
+.exp-role {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Company */
+.exp-company {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+/* Duration */
+.exp-duration {
+    font-size: 14px;
+    opacity: 0.6;
+    margin-bottom: 10px;
+}
+
+/* Description */
+.exp-desc {
+    font-size: 15px;
+    line-height: 1.6;
+}
+#experience {
+    display: none;
+}
+/* 🔥 FORCE ALL SECTIONS VISIBLE */
+#projects-section,
+#certificates-section,
+#experience,
+#education {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+.project-links {
+    display: flex;
+    justify-content: space-between; /* 🔥 pushes right */
+    align-items: center;
+    margin-top: 12px;
+}
+
+.link-btn.screenshots {
+    font-size: 13px;
+    opacity: 0.85;
+}
+.project-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    gap: 20px;
+}
+
+.action-left {
+    display: flex;
+    gap: 10px;
+}
+
+.upload-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.upload-box input[type="file"] {
+    font-size: 12px;
 }

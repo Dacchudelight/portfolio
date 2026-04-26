@@ -75,7 +75,8 @@ def home():
             projects=[],
             certificates=[],
             profile=None,
-            education=[]
+            education=[],
+            experience=[]   # ✅ added
         )
 
     try:
@@ -93,9 +94,13 @@ def home():
         c.execute("SELECT * FROM education ORDER BY id DESC")
         education = c.fetchall()
 
+        # ✅ ADD THIS
+        c.execute("SELECT * FROM experience ORDER BY id DESC")
+        experience = c.fetchall()
+
     except Exception as e:
         print("[ERROR] HOME ERROR:", e)
-        projects, certificates, profile, education = [], [], None, []
+        projects, certificates, profile, education, experience = [], [], None, [], []  # ✅ updated
 
     finally:
         if conn:
@@ -106,7 +111,8 @@ def home():
         projects=projects,
         certificates=certificates,
         profile=profile,
-        education=education
+        education=education,
+        experience=experience   # ✅ added
     )
 
 @app.route("/login", methods=["GET", "POST"])
@@ -183,7 +189,6 @@ def admin():
 
     conn = get_db_connection()
 
-    # [!] Handle DB failure
     if not conn:
         print("DB connection failed in admin()")
         return "Database connection failed", 500
@@ -191,19 +196,24 @@ def admin():
     try:
         c = conn.cursor()
 
-        #  Projects
+        # 🔹 Projects
         c.execute("SELECT * FROM projects ORDER BY id DESC")
         projects = c.fetchall()
 
-        #  Education
+        # 🔹 Education
         c.execute("SELECT * FROM education ORDER BY id DESC")
         education = c.fetchall()
+
+        # 🔥 ADD THIS (IMPORTANT)
+        c.execute("SELECT * FROM project_screenshots ORDER BY id DESC")
+        screenshots = c.fetchall()
 
     except Exception as e:
         print("ADMIN ERROR:", e)
 
         projects = []
         education = []
+        screenshots = []   # 🔥 prevent crash
 
     finally:
         conn.close()
@@ -211,7 +221,8 @@ def admin():
     return render_template(
         "admin.html",
         projects=projects,
-        education=education
+        education=education,
+        screenshots=screenshots   # 🔥 PASS TO TEMPLATE
     )
 
 
@@ -266,7 +277,7 @@ def delete_project(id):
         c.execute("DELETE FROM projects WHERE id=%s", (id,))
         conn.commit()
 
-        flash("Project deleted successfully!", "success")
+        flash("Project deleted successfully!", "error")
 
     except Exception as e:
         print("Delete Project Error:", e)
@@ -836,5 +847,175 @@ def delete_education(id):
         conn.close()
 
     return redirect(url_for("add_education"))
+
+from flask import flash   # 🔹 make sure this is imported
+
+@app.route("/add_experience", methods=["GET", "POST"])
+def add_experience():
+    if "user" not in session:
+        return redirect("/login")
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    if request.method == "POST":
+        role = request.form.get("role")
+        company = request.form.get("company")
+        duration = request.form.get("duration")
+        description = request.form.get("description")
+
+        c.execute(
+            "INSERT INTO experience (role, company, duration, description) VALUES (%s, %s, %s, %s)",
+            (role, company, duration, description)
+        )
+        conn.commit()
+
+        flash("Experience Added Successfully", "success")  # ✅ ADD THIS
+
+        return redirect("/add_experience")
+
+    c.execute("SELECT * FROM experience ORDER BY id DESC")
+    experience = c.fetchall()
+
+    conn.close()
+
+    return render_template("add_experience.html", experience=experience)
+
+
+@app.route("/update_experience/<int:id>", methods=["POST"])
+def update_experience(id):
+    if "user" not in session:
+        return redirect("/login")
+
+    role = request.form.get("role")
+    company = request.form.get("company")
+    duration = request.form.get("duration")
+    description = request.form.get("description")
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute(
+        "UPDATE experience SET role=%s, company=%s, duration=%s, description=%s WHERE id=%s",
+        (role, company, duration, description, id)
+    )
+
+    conn.commit()
+    conn.close()
+
+    flash("Experience Updated Successfully", "success")  # ✅ correct message
+
+    return redirect("/add_experience")
+
+from flask import flash
+
+@app.route("/delete_experience/<int:id>", methods=["POST"])
+def delete_experience(id):
+    if "user" not in session:
+        return redirect("/login")
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    c.execute("DELETE FROM experience WHERE id=%s", (id,))
+    conn.commit()
+    conn.close()
+
+    flash("Experience Deleted Successfully", "danger")  # ✅ add this
+
+    return redirect("/add_experience")
+
+@app.route("/upload_screenshot/<int:project_id>", methods=["POST"])
+def upload_screenshot(project_id):
+    if "user" not in session:
+        return redirect("/login")
+
+    file = request.files.get("image")
+
+    if not file:
+        flash("No file selected", "error")
+        return redirect("/admin")
+
+    try:
+        # Upload to Cloudinary
+        upload_result = cloudinary.uploader.upload(file)
+        image_url = upload_result["secure_url"]
+
+        # Save to DB
+        conn = get_db_connection()
+        c = conn.cursor()
+
+        c.execute(
+            "INSERT INTO project_screenshots (project_id, image_url) VALUES (%s, %s)",
+            (project_id, image_url)
+        )
+
+        conn.commit()
+        conn.close()
+
+        flash("Screenshot uploaded successfully!", "success")
+
+    except Exception as e:
+        print("UPLOAD ERROR:", e)
+        flash("Failed to upload screenshot", "error")
+
+    return redirect("/admin")
+
+@app.route("/project/<int:project_id>/screenshots")
+def project_screenshots(project_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    # Get project title
+    c.execute("SELECT title FROM projects WHERE id=%s", (project_id,))
+    project = c.fetchone()
+    project_title = project[0] if project else "Project"
+
+    # Get screenshots for this project
+    c.execute(
+        "SELECT image_url FROM project_screenshots WHERE project_id=%s",
+        (project_id,)
+    )
+    images = c.fetchall()
+
+    conn.close()
+
+    return render_template("project_screenshots.html", images=images, project_title=project_title)
+
+@app.route("/delete_screenshot/<int:id>", methods=["POST"])
+def delete_screenshot(id):
+    if "user" not in session:
+        return redirect("/login")
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    try:
+        # 🔹 Get image URL first
+        c.execute("SELECT image_url FROM project_screenshots WHERE id=%s", (id,))
+        result = c.fetchone()
+
+        if result:
+            image_url = result[0]
+
+            # 🔥 Extract public_id from URL
+            import cloudinary.uploader
+            public_id = image_url.split("/")[-1].split(".")[0]
+
+            # 🔥 Delete from Cloudinary
+            cloudinary.uploader.destroy(public_id)
+
+        # 🔹 Delete from DB
+        c.execute("DELETE FROM project_screenshots WHERE id=%s", (id,))
+        conn.commit()
+
+    except Exception as e:
+        print("DELETE ERROR:", e)
+
+    finally:
+        conn.close()
+
+    return redirect("/admin")
+
 if __name__ == "__main__":
     app.run(debug=True)

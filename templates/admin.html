@@ -26,6 +26,9 @@
 
     <div class="nav-buttons">
         <a href="/" class="btn">🏠 Home</a>
+
+        <!-- ✅ FIXED HERE -->
+        <a href="{{ url_for('add_experience') }}" class="btn primary">💼 Add Experience</a>
         <a href="{{ url_for('add_project') }}" class="btn primary">+ Add Project</a>
         <a href="{{ url_for('add_education') }}" class="btn primary">🎓 Add Education</a>
         <a href="{{ url_for('certificates_page') }}" class="btn secondary">🎓 Certificates</a>
@@ -39,28 +42,31 @@
 <main class="container">
 
     <!-- 🔹 PROJECTS -->
-    <div class="header-section">
-        <h3>Your Projects</h3>
-        <p>Manage, edit or remove your portfolio projects</p>
-    </div>
+   <div class="header-section">
+    <h3>Your Projects</h3>
+    <p>Manage, edit or remove your portfolio projects</p>
+</div>
 
-    <div class="project-list">
-        {% for p in projects %}
-        <div class="project-card">
+<div class="project-list">
+    {% for p in projects %}
+    <div class="project-card">
 
-            <div class="project-content">
-                <h4>{{ p[1] }}</h4>
-                <p>{{ p[2] }}</p>
-            </div>
+        <div class="project-content">
+            <h4>{{ p[1] }}</h4>
+            <p>{{ p[2] }}</p>
+        </div>
 
-            <div class="project-actions">
+        <div class="project-actions">
+
+            <!-- 🔹 LEFT SIDE -->
+            <div class="action-left">
 
                 <!-- EDIT -->
                 <a href="{{ url_for('edit_project', id=p[0]) }}" class="btn edit">
                     ✏️ Edit
                 </a>
 
-                <!-- DELETE -->
+                <!-- DELETE PROJECT -->
                 <form action="{{ url_for('delete_project', id=p[0]) }}" method="POST">
                     <button type="submit" class="btn danger"
                         onclick="return confirm('Delete this project?');">
@@ -70,12 +76,47 @@
 
             </div>
 
-        </div>
-        {% else %}
-        <p class="empty">No projects added yet.</p>
-        {% endfor %}
-    </div>
+            <!-- 🔹 RIGHT SIDE (UPLOAD) -->
+            <form action="/upload_screenshot/{{ p[0] }}" 
+                  method="POST" 
+                  enctype="multipart/form-data"
+                  class="upload-box">
 
+                <input type="file" name="image" required>
+
+                <button type="submit" class="btn primary">
+                    📸 Add
+                </button>
+            </form>
+
+        </div>
+
+        <!-- 🔥 SCREENSHOT LIST (NEW - SAFE ADDITION) -->
+        <div class="screenshot-list">
+            {% for s in screenshots %}
+                {% if s[1] == p[0] %}
+                <div class="screenshot-item">
+
+                    <img src="{{ s[2] }}" alt="screenshot">
+
+                    <!-- DELETE SCREENSHOT -->
+                    <form action="/delete_screenshot/{{ s[0] }}" method="POST">
+                        <button type="submit" class="btn danger small"
+                            onclick="return confirm('Delete this screenshot?');">
+                            ❌
+                        </button>
+                    </form>
+
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+    </div>
+    {% else %}
+    <p class="empty">No projects added yet.</p>
+    {% endfor %}
+</div>
 </main>
 
 <!-- 🔥 AUTO HIDE TOAST -->

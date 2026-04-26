@@ -36,14 +36,22 @@
     </h2>
 
     <div class="nav-links">
-        <a href="#" onclick="goHome(event)">Home</a>
-        <a href="#" id="eduLink">Education</a>
-        <a href="#" onclick="showProjects(event)">Projects</a>
-        <a href="#" onclick="showCertificates(event)">Certificates</a>
-        <a href="{{ url_for('download_resume') }}" class="resume-btn">Download Resume</a>
-        <a href="{{ url_for('login') }}" class="btn">Admin</a>
-        <button id="themeToggle" class="btn">🌙</button>
-    </div>
+    <a href="#" onclick="goHome(event)">Home</a>
+
+    <!-- KEEP your function -->
+    <a href="#" onclick="showExperience(event)">Experience</a>
+
+    <!-- 🔥 FIXED (no breaking change) -->
+    <a href="#" onclick="showEducation(event)">Education</a>
+
+    <!-- KEEP existing functionality -->
+    <a href="#" onclick="showProjects(event)">Projects</a>
+    <a href="#" onclick="showCertificates(event)">Certificates</a>
+
+    <a href="{{ url_for('download_resume') }}" class="resume-btn">Download Resume</a>
+    <a href="{{ url_for('login') }}" class="btn">Admin</a>
+    <button id="themeToggle" class="btn">🌙</button>
+</div>
 </nav>
 
 <!-- 🔹 HERO -->
@@ -114,34 +122,28 @@
 
 </section>
 
-<!-- 🔹 SKILLS -->
-<section class="skills-section">
-    <h2>Skills</h2>
+<!-- 🔹 EXPERIENCE -->
+<section id="experience">
+    <h2 class="section-title">💼 Experience</h2>
 
-    {% if profile and profile|length > 5 and profile[5] %}
-        <div class="skills-container">
-
-            {% set raw_skills = (profile[5] or "")
-                .replace('\n', ',')
-                .replace('•', ',')
-                .replace('-', ',')
-            %}
-
-            {% for skill in raw_skills.split(',') %}
-                {% if skill.strip() %}
-                    <span class="skill-tag">{{ skill.strip() }}</span>
-                {% endif %}
+    <div class="experience-container">
+        {% if experience and experience|length > 0 %}
+            {% for exp in experience %}
+            <div class="experience-card">
+                <div class="exp-role">{{ exp[1] if exp and exp|length > 1 and exp[1] else "" }}</div>
+                <div class="exp-company">{{ exp[2] if exp and exp|length > 2 and exp[2] else "" }}</div>
+                <div class="exp-duration">{{ exp[3] if exp and exp|length > 3 and exp[3] else "" }}</div>
+                <div class="exp-desc">{{ exp[4] if exp and exp|length > 4 and exp[4] else "" }}</div>
+            </div>
             {% endfor %}
-
-        </div>
-    {% else %}
-        <p>Add your skills...</p>
-    {% endif %}
+        {% else %}
+            <p class="empty">No experience available.</p>
+        {% endif %}
+    </div>
 </section>
 
 <!-- 🔹 EDUCATION -->
 <section id="education">
-
     <h2 class="section-title">🎓 Education</h2>
 
     <div class="education-container">
@@ -151,25 +153,17 @@
                 <div class="edu-left">
                     <h3>{{ edu[1] if edu and edu|length > 1 and edu[1] else "" }}</h3>
                     <p class="edu-institution">{{ edu[2] if edu and edu|length > 2 and edu[2] else "" }}</p>
-
-                    {% if edu and edu|length > 4 and edu[4] %}
-                        <p class="edu-desc">{{ edu[4] }}</p>
-                    {% endif %}
+                    <p class="edu-desc">{{ edu[4] if edu and edu|length > 4 and edu[4] else "" }}</p>
                 </div>
-
-                <div class="edu-right">
-                    <span class="edu-year">{{ edu[3] if edu and edu|length > 3 and edu[3] else "" }}</span>
-                </div>
+                <div class="edu-right">{{ edu[3] if edu and edu|length > 3 and edu[3] else "" }}</div>
             </div>
             {% endfor %}
         {% else %}
-            <p class="empty">No education details added.</p>
+            <p class="empty">No education available.</p>
         {% endif %}
     </div>
-
 </section>
 
-<!-- 🔹 PROJECTS -->
 <section id="projects-section" class="projects hidden-section">
     <h2>📊Projects</h2>
 
@@ -187,8 +181,21 @@
                 {% endif %}
 
                 {% if p and p|length > 4 and p[4] and p[4].startswith('http') %}
-                    <a href="{{ p[4] }}" target="_blank" class="link-btn">View Project →</a>
+                <div class="project-links">
+
+                    <!-- EXISTING LINK (UNCHANGED) -->
+                    <a href="{{ p[4] }}" target="_blank" class="link-btn">
+                        View Project →
+                    </a>
+
+                    <!-- 🔥 UPDATED LINK (CONNECTED TO BACKEND) -->
+                    <a href="/project/{{ p[0] }}/screenshots" class="link-btn screenshots">
+                        View Screenshots →
+                    </a>
+
+                </div>
                 {% endif %}
+
             </div>
             {% endfor %}
         {% else %}

@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project_title }} — Screenshots</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           PROJECT SCREENSHOTS — PREMIUM DARK THEME
+           Matches main portfolio design system
+           ============================================ */
+
+        /* ---------- CSS VARIABLES ---------- */
+        :root {
+            --primary: #2dd4bf;
+            --primary-light: #5eead4;
+            --primary-dark: #14b8a6;
+            --primary-soft: #134e4a;
+            --secondary: #38bdf8;
+            --bg-main: #0a0e17;
+            --bg-card: #111827;
+            --bg-alt: #0f141f;
+            --bg-elevated: #1a2332;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --border-light: #334155;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ---------- GLOBAL RESET ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ---------- CUSTOM SCROLLBAR ---------- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        ::selection {
+            background: var(--primary-soft);
+            color: var(--primary-light);
+        }
+
+        /* ---------- HEADER BAR ---------- */
+        .top-bar {
+            background: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+        }
+
+        .top-bar .back-link:hover {
+            color: var(--primary);
+            border-color: var(--primary-soft);
+            transform: translateX(-3px);
+        }
+
+        .top-bar .back-link svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.25s ease;
+        }
+
+        .top-bar .back-link:hover svg {
+            transform: translateX(-3px);
+        }
+
+        .page-badge {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 0.35rem 1rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            letter-spacing: 0.03em;
+        }
+
+        /* ---------- PAGE HERO ---------- */
+        .page-hero {
+            text-align: center;
+            padding: 3.5rem 6% 2rem;
+            background: linear-gradient(180deg, var(--bg-alt) 0%, var(--bg-main) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .page-hero .label {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .page-hero h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.6rem;
+            line-height: 1.2;
+        }
+
+        .page-hero .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .image-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .image-count .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        /* ---------- GALLERY GRID ---------- */
+        .gallery-container {
+            padding: 2rem 6% 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* ---------- IMAGE CARD ---------- */
+        .img-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all 0.35s cubic-bezier(0.2, 0, 0, 1);
+            cursor: pointer;
+            aspect-ratio: 4 / 3;
+        }
+
+        .img-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border-color: var(--primary-soft);
+        }
+
+        .img-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        .img-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Overlay on hover */
+        .img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.7) 100%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 1.2rem;
+        }
+
+        .img-card:hover .img-overlay {
+            opacity: 1;
+        }
+
+        .img-overlay .view-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 0.45rem 1.2rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: translateY(10px);
+            transition: transform 0.35s ease;
+        }
+
+        .img-card:hover .img-overlay .view-label {
+            transform: translateY(0);
+        }
+
+        .view-label svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ---------- EMPTY STATE ---------- */
+        .empty-state {
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+
+        .empty-state .empty-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ---------- FULLSCREEN MODAL ---------- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: modalZoomIn 0.35s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        @keyframes modalZoomIn {
+            from { 
+                opacity: 0; 
+                transform: scale(0.92); 
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1); 
+            }
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 12px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            object-fit: contain;
+        }
+
+        .modal-close {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10000;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(90deg);
+        }
+
+        /* Navigation arrows */
+        .modal-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10000;
+        }
+
+        .modal-nav:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-prev { left: 1.5rem; }
+        .modal-next { right: 1.5rem; }
+
+        .modal-counter {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            z-index: 10000;
+        }
+
+        /* ---------- FOOTER ---------- */
+        .page-footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            background: var(--bg-alt);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 768px) {
+            .page-hero h1 { font-size: 1.8rem; }
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 1rem;
+            }
+            .gallery-container { padding: 1.5rem 4% 3rem; }
+            .top-bar { padding: 0.8rem 4%; }
+            .modal-nav { width: 40px; height: 40px; font-size: 1rem; }
+            .modal-prev { left: 0.75rem; }
+            .modal-next { right: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .page-hero { padding: 2.5rem 5% 1.5rem; }
+            .page-hero h1 { font-size: 1.5rem; }
+            .gallery-grid { grid-template-columns: 1fr; }
+            .img-card { aspect-ratio: 16 / 11; }
+        }
+
+        /* ---------- ANIMATIONS ---------- */
+        .img-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardAppear 0.5s ease forwards;
+        }
+
+        @keyframes cardAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stagger animations */
+        .img-card:nth-child(1) { animation-delay: 0.05s; }
+        .img-card:nth-child(2) { animation-delay: 0.1s; }
+        .img-card:nth-child(3) { animation-delay: 0.15s; }
+        .img-card:nth-child(4) { animation-delay: 0.2s; }
+        .img-card:nth-child(5) { animation-delay: 0.25s; }
+        .img-card:nth-child(6) { animation-delay: 0.3s; }
+        .img-card:nth-child(7) { animation-delay: 0.35s; }
+        .img-card:nth-child(8) { animation-delay: 0.4s; }
+        .img-card:nth-child(9) { animation-delay: 0.45s; }
+    </style>
+</head>
+<body>
+
+<!-- 🔹 TOP BAR -->
+<header class="top-bar">
+    <a href="/" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back to Portfolio
+    </a>
+    <span class="page-badge">Screenshots</span>
+</header>
+
+<!-- 🔹 PAGE HERO -->
+<section class="page-hero">
+    <span class="label">Project Gallery</span>
+    <h1>{{ project_title }}</h1>
+    <p class="subtitle">Visual showcase of this project</p>
+
+    {% if images and images|length > 0 %}
+    <div class="image-count">
+        <span class="dot"></span>
+        {{ images|length }} screenshot{{ 's' if images|length != 1 else '' }}
+    </div>
+    {% endif %}
+</section>
+
+<!-- 🔹 GALLERY -->
+<div class="gallery-container">
+    {% if images and images|length > 0 %}
+    <div class="gallery-grid">
+        {% for img in images %}
+        <div class="img-card" onclick="openModal({{ loop.index0 }})">
+            <img src="{{ img[0] }}" alt="Screenshot {{ loop.index }}" loading="lazy">
+            <div class="img-overlay">
+                <span class="view-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                    </svg>
+                    View Full Size
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📷</div>
+        <h3>No Screenshots Yet</h3>
+        <p>Screenshots for this project will appear here once uploaded.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 🔹 FOOTER -->
+<footer class="page-footer">
+    &copy; {{ project_title }} — Project Screenshots
+</footer>
+
+<!-- 🔹 FULLSCREEN MODAL -->
+<div class="modal-overlay" id="imageModal">
+    <button class="modal-close" onclick="closeModal()" title="Close">✕</button>
+
+    {% if images and images|length > 1 %}
+    <button class="modal-nav modal-prev" onclick="navigateModal(-1)" title="Previous">‹</button>
+    <button class="modal-nav modal-next" onclick="navigateModal(1)" title="Next">›</button>
+    {% endif %}
+
+    <div class="modal-content">
+        <img id="modalImg" src="" alt="Screenshot">
+    </div>
+
+    {% if images and images|length > 1 %}
+    <div class="modal-counter">
+        <span id="modalCounter">1 / {{ images|length }}</span>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 🔹 JAVASCRIPT -->
+<script>
+    // Collect all image URLs
+    const imageUrls = [
+        {% for img in images %}
+        "{{ img[0] }}"{{ "," if not loop.last else "" }}
+        {% endfor %}
+    ];
+
+    let currentIndex = 0;
+    const totalImages = imageUrls.length;
+
+    function openModal(index) {
+        currentIndex = index;
+        const modal = document.getElementById("imageModal");
+        const img = document.getElementById("modalImg");
+        
+        img.src = imageUrls[currentIndex];
+        modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+        updateCounter();
+    }
+
+    function closeModal() {
+        const modal = document.getElementById("imageModal");
+        modal.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    function navigateModal(direction) {
+        event.stopPropagation();
+        currentIndex = (currentIndex + direction + totalImages) % totalImages;
+        const img = document.getElementById("modalImg");
+        img.src = imageUrls[currentIndex];
+        updateCounter();
+    }
+
+    function updateCounter() {
+        const counter = document.getElementById("modalCounter");
+        if (counter) {
+            counter.textContent = (currentIndex + 1) + " / " + totalImages;
+        }
+    }
+
+    // Close modal on overlay click (not on content)
+    document.getElementById("imageModal").addEventListener("click", function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Keyboard navigation
+    document.addEventListener("keydown", function(e) {
+        const modal = document.getElementById("imageModal");
+        if (!modal.classList.contains("active")) return;
+
+        if (e.key === "Escape") closeModal();
+        if (e.key === "ArrowLeft") navigateModal(-1);
+        if (e.key === "ArrowRight") navigateModal(1);
+    });
+</script>
+
+</body>
+</html>

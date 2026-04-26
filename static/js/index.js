@@ -1,101 +1,101 @@
-function showProjects(event) {
-    if (event) event.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
 
-    const proj = document.getElementById("projects-section");
-    const btnProj = document.getElementById("btn-projects");
+    // 🔹 SCROLL HELPER
+    function scrollWithOffset(element) {
+        if (!element) return;
 
-    proj.classList.remove("hidden-section");
-    proj.classList.add("show-section");
+        const navbar = document.querySelector(".navbar");
+        const navbarHeight = navbar ? navbar.offsetHeight : 80;
 
-    btnProj.classList.add("active-btn");
+        const y = element.offsetTop - navbarHeight - 10;
 
-    window.scrollTo({ top: proj.offsetTop - 80, behavior: 'smooth' });
-}
+        window.scrollTo({
+            top: y,
+            behavior: "smooth"
+        });
+    }
 
-function showCertificates(event) {
-    if (event) event.preventDefault();
+    // 🔹 EXPERIENCE
+    window.showExperience = function(event) {
+        if (event) event.preventDefault();
 
-    const cert = document.getElementById("certificates-section");
-    const btnCert = document.getElementById("btn-certificates");
+        const section = document.getElementById("experience");
+        scrollWithOffset(section);
+    };
 
-    cert.classList.remove("hidden-section");
-    cert.classList.add("show-section");
+    // 🔹 EDUCATION (🔥 FIXED)
+    window.showEducation = function(event) {
+        if (event) event.preventDefault();
 
-    btnCert.classList.add("active-btn");
+        const section = document.getElementById("education");
+        scrollWithOffset(section);
+    };
 
-    window.scrollTo({ top: cert.offsetTop - 80, behavior: 'smooth' });
-}
+    // 🔹 PROJECTS
+    window.showProjects = function(event) {
+        if (event) event.preventDefault();
 
-function goHome(event) {
-    if (event) event.preventDefault();
+        const section = document.getElementById("projects-section");
+        scrollWithOffset(section);
+    };
 
-    const proj = document.getElementById("projects-section");
-    const cert = document.getElementById("certificates-section");
+    // 🔹 CERTIFICATES
+    window.showCertificates = function(event) {
+        if (event) event.preventDefault();
 
-    proj.classList.add("hidden-section");
-    cert.classList.add("hidden-section");
+        const section = document.getElementById("certificates-section");
+        scrollWithOffset(section);
+    };
 
-    proj.classList.remove("show-section");
-    cert.classList.remove("show-section");
+    // 🔹 HOME
+    window.goHome = function(event) {
+        if (event) event.preventDefault();
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    };
+
+    // 🔹 FLASH AUTO HIDE
     setTimeout(() => {
         const flash = document.querySelector('.flash-container');
         if (flash) {
             flash.style.opacity = '0';
-            setTimeout(() => {
-                flash.remove();
-            }, 500); // smooth fade out
+            setTimeout(() => flash.remove(), 500);
         }
-    }, 2000); // 2 seconds
-    
-    
-    //LIGHT THEME
-const toggleBtn = document.getElementById("themeToggle");
+    }, 2000);
 
-// Load saved theme
-if (localStorage.getItem("theme") === "light") {
-    document.body.classList.add("light-theme");
-    toggleBtn.textContent = "☀️";
-}
+    // 🔹 THEME TOGGLE
+    const toggleBtn = document.getElementById("themeToggle");
 
-toggleBtn.addEventListener("click", () => {
-    document.body.classList.toggle("light-theme");
+    if (toggleBtn) {
+        if (localStorage.getItem("theme") === "light") {
+            document.body.classList.add("light-theme");
+            toggleBtn.textContent = "☀️";
+        }
 
-    if (document.body.classList.contains("light-theme")) {
-        localStorage.setItem("theme", "light");
-        toggleBtn.textContent = "☀️";
-    } else {
-        localStorage.setItem("theme", "dark");
-        toggleBtn.textContent = "🌙";
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("light-theme");
+
+            if (document.body.classList.contains("light-theme")) {
+                localStorage.setItem("theme", "light");
+                toggleBtn.textContent = "☀️";
+            } else {
+                localStorage.setItem("theme", "dark");
+                toggleBtn.textContent = "🌙";
+            }
+        });
     }
-});
 
+    // 🔹 DOWNLOAD RESUME
+    window.downloadResume = function(e) {
+        e.preventDefault();
 
+        const link = document.createElement('a');
+        link.href = "/static/files/Darshan_Resume.pdf";
+        link.download = "Darshan_Resume.pdf";
+        link.click();
+    };
 
-
-function downloadResume(e) {
-    e.preventDefault();
-
-    const link = document.createElement('a');
-    link.href = "{{ url_for('static', filename='files/Darshan_Resume.pdf') }}";
-    link.download = "Darshan_Resume.pdf";
-    link.click();
-}
-
-
-const eduLink = document.getElementById("eduLink");
-const eduSection = document.getElementById("education");
-
-eduLink.addEventListener("click", function(e) {
-    e.preventDefault();
-
-    // Show section
-    eduSection.style.display = "block";
-
-    // Smooth scroll
-    eduSection.scrollIntoView({
-        behavior: "smooth"
-    });
 });
